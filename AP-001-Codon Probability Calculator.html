@@ -286,7 +286,7 @@
       }
       const stopCount = aaCounts['*'] ? 1 : 0;
       const aaCount = Object.keys(aaCounts).length - stopCount;
-      let output = `입력된 코돈: ${input}\n\n가능한 아미노산 및 확률 (${aaCount}개${stopCount ? ' + Stop codon' : ''}):\n`;
+      let output = `INPUT CODON: ${input}\n\nPOSSIBLE AMINOACIDS AND PROPERTIES (${aaCount}EA${stopCount ? ' + Stop codon' : ''}):\n`;
       for (const [aa, prob] of Object.entries(aaCounts).sort((a, b) => b[1] - a[1])) {
         const line = aa === '*' ? `<span class="stop">  * (Stop): ${(prob / total * 100).toFixed(2)}%</span>` : `  ${aa}: ${(prob / total * 100).toFixed(2)}%`;
         output += line + '\n';
