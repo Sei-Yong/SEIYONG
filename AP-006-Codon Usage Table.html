@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Codon Usage Tables</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .tables {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: nowrap;
+    }
+    .codon-box {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      width: 280px;
+      font-size: 13px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 4px;
+      text-align: center;
+    }
+    tr[style*=""] {
+      background: yellow !important;
+    }
+	    footer {
+    text-align: center;
+    margin-top: 10px;
+    color: #666;
+    font-size: 14px;
+    }
+	  text-align: center;
+    margin-top: 10px;
+    color: #666;
+    font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Codon Usage Tables</h2>
+  <div class="tables">
+    <div class="codon-box"><h3 style="text-align:center; font-style: italic;">E. coli</h3><table style="margin:auto; border-collapse: collapse;"><tr style="background:#f2f2f2;"><th>Triplet</th><th>AA</th><th>Fraction</th></tr><tr style="background:yellow;"><td>TTT</td><td>F</td><td>0.58</td></tr><tr style=""><td>TTC</td><td>F</td><td>0.42</td></tr><tr style=""><td>TTA</td><td>L</td><td>0.14</td></tr><tr style=""><td>TTG</td><td>L</td><td>0.13</td></tr><tr style="background:yellow;"><td>TAT</td><td>Y</td><td>0.59</td></tr><tr style=""><td>TAC</td><td>Y</td><td>0.41</td></tr><tr style=""><td>TAA</td><td>*</td><td>0.61</td></tr><tr style=""><td>TAG</td><td>*</td><td>0.09</td></tr><tr style=""><td>CTT</td><td>L</td><td>0.12</td></tr><tr style=""><td>CTC</td><td>L</td><td>0.10</td></tr><tr style=""><td>CTA</td><td>L</td><td>0.04</td></tr><tr style="background:yellow;"><td>CTG</td><td>L</td><td>0.47</td></tr><tr style="background:yellow;"><td>CAT</td><td>H</td><td>0.57</td></tr><tr style=""><td>CAC</td><td>H</td><td>0.43</td></tr><tr style=""><td>CAA</td><td>Q</td><td>0.34</td></tr><tr style="background:yellow;"><td>CAG</td><td>Q</td><td>0.66</td></tr><tr style="background:yellow;"><td>ATT</td><td>I</td><td>0.49</td></tr><tr style=""><td>ATC</td><td>I</td><td>0.39</td></tr><tr style=""><td>ATA</td><td>I</td><td>0.11</td></tr><tr style="background:yellow;"><td>ATG</td><td>M</td><td>1.00</td></tr><tr style=""><td>AAT</td><td>N</td><td>0.49</td></tr><tr style="background:yellow;"><td>AAC</td><td>N</td><td>0.51</td></tr><tr style="background:yellow;"><td>AAA</td><td>K</td><td>0.74</td></tr><tr style=""><td>AAG</td><td>K</td><td>0.26</td></tr><tr style=""><td>GTT</td><td>V</td><td>0.28</td></tr><tr style=""><td>GTC</td><td>V</td><td>0.20</td></tr><tr style=""><td>GTA</td><td>V</td><td>0.17</td></tr><tr style="background:yellow;"><td>GTG</td><td>V</td><td>0.35</td></tr><tr style="background:yellow;"><td>GAT</td><td>D</td><td>0.63</td></tr><tr style=""><td>GAC</td><td>D</td><td>0.37</td></tr><tr style="background:yellow;"><td>GAA</td><td>E</td><td>0.68</td></tr><tr style=""><td>GAG</td><td>E</td><td>0.32</td></tr><tr style=""><td>TCT</td><td>S</td><td>0.17</td></tr><tr style=""><td>TCC</td><td>S</td><td>0.15</td></tr><tr style=""><td>TCA</td><td>S</td><td>0.14</td></tr><tr style=""><td>TCG</td><td>S</td><td>0.14</td></tr><tr style=""><td>TGT</td><td>C</td><td>0.46</td></tr><tr style="background:yellow;"><td>TGC</td><td>C</td><td>0.54</td></tr><tr style=""><td>TGA</td><td>*</td><td>0.30</td></tr><tr style="background:yellow;"><td>TGG</td><td>W</td><td>1.00</td></tr><tr style=""><td>CCT</td><td>P</td><td>0.18</td></tr><tr style=""><td>CCC</td><td>P</td><td>0.13</td></tr><tr style=""><td>CCA</td><td>P</td><td>0.20</td></tr><tr style="background:yellow;"><td>CCG</td><td>P</td><td>0.49</td></tr><tr style="background:yellow;"><td>CGT</td><td>R</td><td>0.36</td></tr><tr style="background:yellow;"><td>CGC</td><td>R</td><td>0.36</td></tr><tr style=""><td>CGA</td><td>R</td><td>0.07</td></tr><tr style=""><td>CGG</td><td>R</td><td>0.11</td></tr><tr style=""><td>ACT</td><td>T</td><td>0.19</td></tr><tr style=""><td>ACC</td><td>T</td><td>0.40</td></tr><tr style=""><td>ACA</td><td>T</td><td>0.17</td></tr><tr style="background:yellow;"><td>ACG</td><td>T</td><td>0.25</td></tr><tr style=""><td>AGT</td><td>S</td><td>0.16</td></tr><tr style="background:yellow;"><td>AGC</td><td>S</td><td>0.25</td></tr><tr style=""><td>AGA</td><td>R</td><td>0.07</td></tr><tr style=""><td>AGG</td><td>R</td><td>0.04</td></tr><tr style=""><td>GCT</td><td>A</td><td>0.18</td></tr><tr style=""><td>GCC</td><td>A</td><td>0.26</td></tr><tr style=""><td>GCA</td><td>A</td><td>0.23</td></tr><tr style="background:yellow;"><td>GCG</td><td>A</td><td>0.33</td></tr><tr style=""><td>GGT</td><td>G</td><td>0.35</td></tr><tr style="background:yellow;"><td>GGC</td><td>G</td><td>0.37</td></tr><tr style=""><td>GGA</td><td>G</td><td>0.13</td></tr><tr style=""><td>GGG</td><td>G</td><td>0.15</td></tr></table></div>
+    <div class="codon-box"><h3 style="text-align:center; font-style: italic;">S. cerevisiae</h3><table style="margin:auto; border-collapse: collapse;"><tr style="background:#f2f2f2;"><th>Triplet</th><th>AA</th><th>Fraction</th></tr><tr style="background:yellow;"><td>TTT</td><td>F</td><td>0.59</td></tr><tr style=""><td>TTC</td><td>F</td><td>0.41</td></tr><tr style=""><td>TTA</td><td>L</td><td>0.28</td></tr><tr style="background:yellow;"><td>TTG</td><td>L</td><td>0.29</td></tr><tr style="background:yellow;"><td>TAT</td><td>Y</td><td>0.56</td></tr><tr style=""><td>TAC</td><td>Y</td><td>0.44</td></tr><tr style=""><td>TAA</td><td>*</td><td>0.48</td></tr><tr style=""><td>TAG</td><td>*</td><td>0.24</td></tr><tr style=""><td>CTT</td><td>L</td><td>0.13</td></tr><tr style=""><td>CTC</td><td>L</td><td>0.06</td></tr><tr style=""><td>CTA</td><td>L</td><td>0.14</td></tr><tr style=""><td>CTG</td><td>L</td><td>0.11</td></tr><tr style="background:yellow;"><td>CAT</td><td>H</td><td>0.64</td></tr><tr style=""><td>CAC</td><td>H</td><td>0.36</td></tr><tr style="background:yellow;"><td>CAA</td><td>Q</td><td>0.69</td></tr><tr style=""><td>CAG</td><td>Q</td><td>0.31</td></tr><tr style="background:yellow;"><td>ATT</td><td>I</td><td>0.46</td></tr><tr style=""><td>ATC</td><td>I</td><td>0.26</td></tr><tr style=""><td>ATA</td><td>I</td><td>0.27</td></tr><tr style="background:yellow;"><td>ATG</td><td>M</td><td>1.00</td></tr><tr style="background:yellow;"><td>AAT</td><td>N</td><td>0.59</td></tr><tr style=""><td>AAC</td><td>N</td><td>0.41</td></tr><tr style="background:yellow;"><td>AAA</td><td>K</td><td>0.58</td></tr><tr style=""><td>AAG</td><td>K</td><td>0.42</td></tr><tr style="background:yellow;"><td>GTT</td><td>V</td><td>0.39</td></tr><tr style=""><td>GTC</td><td>V</td><td>0.21</td></tr><tr style=""><td>GTA</td><td>V</td><td>0.21</td></tr><tr style=""><td>GTG</td><td>V</td><td>0.19</td></tr><tr style="background:yellow;"><td>GAT</td><td>D</td><td>0.65</td></tr><tr style=""><td>GAC</td><td>D</td><td>0.35</td></tr><tr style="background:yellow;"><td>GAA</td><td>E</td><td>0.71</td></tr><tr style=""><td>GAG</td><td>E</td><td>0.29</td></tr><tr style="background:yellow;"><td>TCT</td><td>S</td><td>0.26</td></tr><tr style=""><td>TCC</td><td>S</td><td>0.16</td></tr><tr style=""><td>TCA</td><td>S</td><td>0.21</td></tr><tr style=""><td>TCG</td><td>S</td><td>0.10</td></tr><tr style="background:yellow;"><td>TGT</td><td>C</td><td>0.63</td></tr><tr style=""><td>TGC</td><td>C</td><td>0.37</td></tr><tr style=""><td>TGA</td><td>*</td><td>0.29</td></tr><tr style="background:yellow;"><td>TGG</td><td>W</td><td>1.00</td></tr><tr style=""><td>CCT</td><td>P</td><td>0.31</td></tr><tr style=""><td>CCC</td><td>P</td><td>0.15</td></tr><tr style="background:yellow;"><td>CCA</td><td>P</td><td>0.41</td></tr><tr style=""><td>CCG</td><td>P</td><td>0.12</td></tr><tr style=""><td>CGT</td><td>R</td><td>0.15</td></tr><tr style=""><td>CGC</td><td>R</td><td>0.06</td></tr><tr style=""><td>CGA</td><td>R</td><td>0.07</td></tr><tr style=""><td>CGG</td><td>R</td><td>0.04</td></tr><tr style="background:yellow;"><td>ACT</td><td>T</td><td>0.35</td></tr><tr style=""><td>ACC</td><td>T</td><td>0.22</td></tr><tr style=""><td>ACA</td><td>T</td><td>0.30</td></tr><tr style=""><td>ACG</td><td>T</td><td>0.13</td></tr><tr style=""><td>AGT</td><td>S</td><td>0.16</td></tr><tr style=""><td>AGC</td><td>S</td><td>0.11</td></tr><tr style="background:yellow;"><td>AGA</td><td>R</td><td>0.48</td></tr><tr style=""><td>AGG</td><td>R</td><td>0.21</td></tr><tr style="background:yellow;"><td>GCT</td><td>A</td><td>0.38</td></tr><tr style=""><td>GCC</td><td>A</td><td>0.22</td></tr><tr style=""><td>GCA</td><td>A</td><td>0.29</td></tr><tr style=""><td>GCG</td><td>A</td><td>0.11</td></tr><tr style="background:yellow;"><td>GGT</td><td>G</td><td>0.47</td></tr><tr style=""><td>GGC</td><td>G</td><td>0.19</td></tr><tr style=""><td>GGA</td><td>G</td><td>0.22</td></tr><tr style=""><td>GGG</td><td>G</td><td>0.12</td></tr></table></div>
+    <div class="codon-box"><h3 style="text-align:center; font-style: italic;">Homo sapiens</h3><table style="margin:auto; border-collapse: collapse;"><tr style="background:#f2f2f2;"><th>Triplet</th><th>AA</th><th>Fraction</th></tr><tr style=""><td>TTT</td><td>F</td><td>0.45</td></tr><tr style="background:yellow;"><td>TTC</td><td>F</td><td>0.55</td></tr><tr style=""><td>TTA</td><td>L</td><td>0.07</td></tr><tr style=""><td>TTG</td><td>L</td><td>0.13</td></tr><tr style=""><td>TAT</td><td>Y</td><td>0.43</td></tr><tr style="background:yellow;"><td>TAC</td><td>Y</td><td>0.57</td></tr><tr style=""><td>TAA</td><td>*</td><td>0.28</td></tr><tr style=""><td>TAG</td><td>*</td><td>0.20</td></tr><tr style=""><td>CTT</td><td>L</td><td>0.13</td></tr><tr style=""><td>CTC</td><td>L</td><td>0.20</td></tr><tr style=""><td>CTA</td><td>L</td><td>0.07</td></tr><tr style="background:yellow;"><td>CTG</td><td>L</td><td>0.41</td></tr><tr style=""><td>CAT</td><td>H</td><td>0.41</td></tr><tr style="background:yellow;"><td>CAC</td><td>H</td><td>0.59</td></tr><tr style=""><td>CAA</td><td>Q</td><td>0.25</td></tr><tr style="background:yellow;"><td>CAG</td><td>Q</td><td>0.75</td></tr><tr style=""><td>ATT</td><td>I</td><td>0.36</td></tr><tr style="background:yellow;"><td>ATC</td><td>I</td><td>0.48</td></tr><tr style=""><td>ATA</td><td>I</td><td>0.16</td></tr><tr style="background:yellow;"><td>ATG</td><td>M</td><td>1.00</td></tr><tr style=""><td>AAT</td><td>N</td><td>0.46</td></tr><tr style="background:yellow;"><td>AAC</td><td>N</td><td>0.54</td></tr><tr style=""><td>AAA</td><td>K</td><td>0.42</td></tr><tr style="background:yellow;"><td>AAG</td><td>K</td><td>0.58</td></tr><tr style=""><td>GTT</td><td>V</td><td>0.18</td></tr><tr style=""><td>GTC</td><td>V</td><td>0.24</td></tr><tr style=""><td>GTA</td><td>V</td><td>0.11</td></tr><tr style="background:yellow;"><td>GTG</td><td>V</td><td>0.47</td></tr><tr style=""><td>GAT</td><td>D</td><td>0.46</td></tr><tr style="background:yellow;"><td>GAC</td><td>D</td><td>0.54</td></tr><tr style=""><td>GAA</td><td>E</td><td>0.42</td></tr><tr style="background:yellow;"><td>GAG</td><td>E</td><td>0.58</td></tr><tr style=""><td>TCT</td><td>S</td><td>0.18</td></tr><tr style=""><td>TCC</td><td>S</td><td>0.22</td></tr><tr style=""><td>TCA</td><td>S</td><td>0.15</td></tr><tr style=""><td>TCG</td><td>S</td><td>0.06</td></tr><tr style=""><td>TGT</td><td>C</td><td>0.45</td></tr><tr style="background:yellow;"><td>TGC</td><td>C</td><td>0.55</td></tr><tr style=""><td>TGA</td><td>*</td><td>0.52</td></tr><tr style="background:yellow;"><td>TGG</td><td>W</td><td>1.00</td></tr><tr style=""><td>CCT</td><td>P</td><td>0.28</td></tr><tr style="background:yellow;"><td>CCC</td><td>P</td><td>0.33</td></tr><tr style=""><td>CCA</td><td>P</td><td>0.27</td></tr><tr style=""><td>CCG</td><td>P</td><td>0.11</td></tr><tr style=""><td>CGT</td><td>R</td><td>0.08</td></tr><tr style=""><td>CGC</td><td>R</td><td>0.19</td></tr><tr style=""><td>CGA</td><td>R</td><td>0.11</td></tr><tr style="background:yellow;"><td>CGG</td><td>R</td><td>0.21</td></tr><tr style=""><td>ACT</td><td>T</td><td>0.24</td></tr><tr style="background:yellow;"><td>ACC</td><td>T</td><td>0.36</td></tr><tr style=""><td>ACA</td><td>T</td><td>0.28</td></tr><tr style=""><td>ACG</td><td>T</td><td>0.12</td></tr><tr style=""><td>AGT</td><td>S</td><td>0.15</td></tr><tr style="background:yellow;"><td>AGC</td><td>S</td><td>0.24</td></tr><tr style=""><td>AGA</td><td>R</td><td>0.20</td></tr><tr style=""><td>AGG</td><td>R</td><td>0.20</td></tr><tr style=""><td>GCT</td><td>A</td><td>0.26</td></tr><tr style="background:yellow;"><td>GCC</td><td>A</td><td>0.40</td></tr><tr style=""><td>GCA</td><td>A</td><td>0.23</td></tr><tr style=""><td>GCG</td><td>A</td><td>0.11</td></tr><tr style=""><td>GGT</td><td>G</td><td>0.16</td></tr><tr style="background:yellow;"><td>GGC</td><td>G</td><td>0.34</td></tr><tr style=""><td>GGA</td><td>G</td><td>0.25</td></tr><tr style=""><td>GGG</td><td>G</td><td>0.25</td></tr></table></div>
+    <div style="text-align: center; margin-top: 30px;">
+	<a href="AP-000-Main.html" style="font-size: 16px; color: #007acc; text-decoration: none;">&larr; Back to Main</a>
+	</div>
+  </div>
+<footer>
+  <div>Copyright 2025. BIONOTE INC. Antibody Platform Design Team, Jun Sei-Yong</div>
+</footer>
+</body>
+</html>

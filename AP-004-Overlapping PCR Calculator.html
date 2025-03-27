@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Overlapping PCR Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 40px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    table { border-collapse: collapse; margin: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: center; }
+    .gray { background-color: #ddd; }
+    .yellow { background-color: #ffff99; }
+    input[type="number"] { width: 80px; }
+    .flex-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+    footer {
+      text-align: center;
+      margin-top: 10px;
+      color: #666;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2 style="text-align: center">Overlapping PCR Calculator</h2>
+
+  <!-- Fragment Inputs -->
+  <div class="flex-container">
+    <table>
+      <tr><th colspan="3">Fragment Information</th></tr>
+      <tr><th>Fragment</th><th>Size (bp)</th><th>Conc. (ng/uL)</th></tr>
+      <tr><td>Fragment 1</td><td><input type="number" id="f1Size" class="yellow"></td><td><input type="number" id="f1Conc" class="yellow"></td></tr>
+      <tr><td>Fragment 2</td><td><input type="number" id="f2Size" class="yellow"></td><td><input type="number" id="f2Conc" class="yellow"></td></tr>
+      <tr><td>Fragment 3</td><td><input type="number" id="f3Size" class="yellow"></td><td><input type="number" id="f3Conc" class="yellow"></td></tr>
+      <tr><td>Fragment 4</td><td><input type="number" id="f4Size" class="yellow"></td><td><input type="number" id="f4Conc" class="yellow"></td></tr>
+    </table>
+
+    <!-- Overlapping PCR (100uL) Table -->
+    <table>
+      <tr><th colspan="2">Overlapping PCR (100uL)</th></tr>
+      <tr><td>Fragment 1</td><td id="f1Vol"></td></tr>
+      <tr><td>Fragment 2</td><td id="f2Vol"></td></tr>
+      <tr><td>Fragment 3</td><td id="f3Vol"></td></tr>
+      <tr><td>Fragment 4</td><td id="f4Vol"></td></tr>
+      <tr><td>2x-pfu</td><td>50.00</td></tr>
+      <tr><td>N-sol</td><td>8.00</td></tr>
+      <tr><td>Primer For</td><td>0.40</td></tr>
+      <tr><td>Primer Rev</td><td>0.40</td></tr>
+      <tr><td>UPW</td><td id="fUpw"></td></tr>
+    </table>
+
+    <!-- Output Table -->
+    <table>
+      <tr><th colspan="2">Overlapping PCR (Library)</th></tr>
+      <tr><td colspan="3">Library PCR Volume (uL): <input type="number" id="libVol" value="200" class="yellow"></td></tr>
+      <tr><td>Fragment 1</td><td id="lib1"></td></tr>
+      <tr><td>Fragment 2</td><td id="lib2"></td></tr>
+      <tr><td>Fragment 3</td><td id="lib3"></td></tr>
+      <tr><td>Fragment 4</td><td id="lib4"></td></tr>
+      <tr><td>2x-pfu</td><td id="pfu"></td></tr>
+      <tr><td>N-sol</td><td id="nsol"></td></tr>
+      <tr><td>Primer F</td><td id="primerF"></td></tr>
+      <tr><td>Primer R</td><td id="primerR"></td></tr>
+      <tr><td>UPW</td><td id="upw"></td></tr>
+    </table>
+  </div>
+  <div style="text-align: center; margin-top: 30px;">
+  <a href="AP-000-Main.html" style="font-size: 16px; color: #007acc; text-decoration: none;">&larr; Back to Main</a>
+</div>
+</div>
+
+<footer>
+  <div>Copyright 2025. BIONOTE INC. Antibody Platform Design Team, Jun Sei-Yong</div>
+</footer>
+
+<script>
+function calcOverlappingPCR() {
+  const sizes = [1,2,3,4].map(i => parseFloat(document.getElementById(`f${i}Size`).value));
+  const concs = [1,2,3,4].map(i => parseFloat(document.getElementById(`f${i}Conc`).value));
+  const libVol = parseFloat(document.getElementById('libVol').value);
+  const baseFactor = 1515;
+
+  // 기본 부피 계산 (100uL 기준)
+  const baseVolumes = sizes.map((size, i) => {
+    const conc = concs[i];
+    return (size && conc) ? (1 / (conc / 1000 * baseFactor / size)) : 0;
+  });
+  const baseTotal = baseVolumes.reduce((sum, v) => sum + v, 0);
+  const fixed100uL = 50 + 8 + 0.4 + 0.4;
+  const upw100uL = 100 - baseTotal - fixed100uL;
+
+  // Library PCR 계산
+  const libVolumes = sizes.map((size, i) => {
+    const conc = concs[i];
+    return (size && conc) ? (2.5 / (conc / 1000 * baseFactor / size)) : 0;
+  });
+  const scaledVolumes = libVolumes.map(v => v * (libVol / 100));
+  const fixedVals = {
+    pfux2: 50 * (libVol / 100),
+    nsol: 8 * (libVol / 100),
+    primerF: 0.6 * (libVol / 100),
+    primerR: 0.6 * (libVol / 100),
+  };
+  const totalUsed = scaledVolumes.reduce((sum, v) => sum + v, 0)
+    + fixedVals.pfux2 + fixedVals.nsol + fixedVals.primerF + fixedVals.primerR;
+  const upw = libVol - totalUsed;
+
+  // 결과 출력
+  baseVolumes.forEach((v, i) => {
+    document.getElementById(`f${i+1}Vol`).textContent = v.toFixed(2);
+  });
+  document.getElementById("fUpw").textContent = upw100uL.toFixed(2);
+
+  scaledVolumes.forEach((v, i) => {
+    document.getElementById(`lib${i+1}`).textContent = v.toFixed(2);
+  });
+  document.getElementById("pfu").textContent = fixedVals.pfux2.toFixed(2);
+  document.getElementById("nsol").textContent = fixedVals.nsol.toFixed(2);
+  document.getElementById("primerF").textContent = fixedVals.primerF.toFixed(2);
+  document.getElementById("primerR").textContent = fixedVals.primerR.toFixed(2);
+  document.getElementById("upw").textContent = upw.toFixed(2);
+}
+
+["f1Size", "f1Conc", "f2Size", "f2Conc", "f3Size", "f3Conc", "f4Size", "f4Conc", "libVol"]
+  .forEach(id => document.getElementById(id).addEventListener("input", calcOverlappingPCR));
+</script>
+</body>
+</html>

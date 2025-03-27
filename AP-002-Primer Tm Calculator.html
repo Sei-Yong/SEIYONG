@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Oligo Tm Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background-color: #f2f2f2;
+    }
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      background-color: #0077cc;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005fa3;
+    }
+    .result {
+      font-weight: bold;
+      font-size: 18px;
+      margin-top: 10px;
+      color: #333;
+    }
+    .button-group {
+      display: flex;
+      gap: 10px;
+    }
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #666;
+      font-size: 14px;
+    }
+    footer img {
+      height: 50px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 style="text-align: center;">Oligonucleotide Tm Calculator</h1>
+    <label for="sequence">Enter DNA sequence (5'→3'):</label>
+    <textarea id="sequence" rows="3" placeholder="e.g. ATGCGTACGTA"></textarea>
+
+    <div class="button-group">
+      <button onclick="calculateBasicTm()">Calculate Basic Tm</button>
+      <button onclick="swapStrands()">Swap Strands</button>
+    </div>
+
+    <div class="result" id="basicTm"></div>
+    <div class="result" id="gcContent"></div>
+    <div class="result" id="primerLength"></div>
+	<div style="text-align: center; margin-top: 30px;">
+  <a href="AP-000-Main.html" style="font-size: 16px; color: #007acc; text-decoration: none;">&larr; Back to Main</a>
+  </div>
+  </div>
+
+  <footer>
+    <div>Copyright 2025. BIONOTE INC. Antibody Platform Design Team, Jun Sei-Yong</div>
+  </footer>
+
+  <script>
+    const degenerateMap = {
+      A: ['A'], T: ['T'], G: ['G'], C: ['C'],
+      R: ['A', 'G'], Y: ['C', 'T'],
+      S: ['G', 'C'], W: ['A', 'T'],
+      K: ['G', 'T'], M: ['A', 'C'],
+      B: ['C', 'G', 'T'], D: ['A', 'G', 'T'],
+      H: ['A', 'C', 'T'], V: ['A', 'C', 'G'],
+      N: ['A', 'T', 'G', 'C']
+    };
+
+    const complementMap = {
+      A: 'T', T: 'A', G: 'C', C: 'G',
+      R: 'Y', Y: 'R', S: 'S', W: 'W',
+      K: 'M', M: 'K', B: 'V', D: 'H',
+      H: 'D', V: 'B', N: 'N'
+    };
+
+    function calculateBasicTm() {
+      const inputSeq = document.getElementById('sequence').value.toUpperCase();
+      const sequences = expandDegenerate(inputSeq);
+
+      if (sequences.length === 0) {
+        document.getElementById('basicTm').innerText = 'Invalid sequence.';
+        return;
+      }
+
+      let minTm = Infinity;
+      let maxTm = -Infinity;
+      let totalGC = 0;
+      let totalLength = 0;
+
+      for (const seq of sequences) {
+        const A = (seq.match(/A/g) || []).length;
+        const T = (seq.match(/T/g) || []).length;
+        const G = (seq.match(/G/g) || []).length;
+        const C = (seq.match(/C/g) || []).length;
+
+        const length = seq.length;
+        const gc = ((G + C) / length) * 100;
+        totalGC += gc;
+        totalLength += length;
+
+        let basicTmVal;
+        if (length < 14) {
+          basicTmVal = (A + T) * 2 + (G + C) * 4;
+        } else {
+          basicTmVal = 64.9 + 41 * (G + C - 16.4) / length;
+        }
+
+        if (basicTmVal < minTm) minTm = basicTmVal;
+        if (basicTmVal > maxTm) maxTm = basicTmVal;
+      }
+
+      const avgGC = totalGC / sequences.length;
+      const avgLength = totalLength / sequences.length;
+
+      document.getElementById('basicTm').innerText =
+        minTm === maxTm ? `Basic Tm: ${minTm.toFixed(2)} °C`
+                        : `Basic Tm Range: ${minTm.toFixed(2)} - ${maxTm.toFixed(2)} °C`;
+
+      document.getElementById('gcContent').innerText = `GC Content: ${avgGC.toFixed(2)}%`;
+      document.getElementById('primerLength').innerText = `Primer Length: ${avgLength.toFixed(0)} bp`;
+    }
+
+    function expandDegenerate(seq) {
+      const result = [''];
+      for (const base of seq) {
+        const options = degenerateMap[base];
+        if (!options) return [];
+        const temp = [];
+        for (const r of result) {
+          for (const opt of options) {
+            temp.push(r + opt);
+          }
+        }
+        result.splice(0, result.length, ...temp);
+        if (result.length > 1024) break; // prevent explosion
+      }
+      return result;
+    }
+
+    function swapStrands() {
+      const input = document.getElementById('sequence').value.toUpperCase();
+      let complement = '';
+      for (let i = input.length - 1; i >= 0; i--) {
+        const base = input[i];
+        complement += complementMap[base] || 'N';
+      }
+      document.getElementById('sequence').value = complement;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Codon to Amino Acid Probability Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 40px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      font-size: 26px;
+      margin-bottom: 25px;
+	  text-align: center;
+    }
+    .tables {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+    .codon-box, .degenerate-box {
+      flex: 1;
+      text-align: center;
+    }
+    .codon-box h3, .degenerate-box h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    table {
+      border-collapse: collapse;
+      margin: auto;
+      font-size: 16px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px 10px;
+      text-align: center;
+    }
+    .codon-table th[colspan] {
+      background: #f2f2f2;
+    }
+	.codon-table th[rowspan] {
+	  background: #f2f2f2;
+	}
+    .form-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+    .input-section, .spiked-table-section {
+      flex: 1;
+      margin-right: 20px;
+    }
+    .input-section input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 5px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .spiked-table-section table {
+      width: auto;
+    }
+    button {
+      width: 200px;
+      padding: 10px;
+      font-size: 16px;
+      background-color: #007acc;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: block;
+      margin: 0 auto 20px auto;
+    }
+    button:hover {
+      background-color: #005fa3;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #e8f5e9;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      font-family: monospace;
+    }
+    .stop {
+      color: red;
+    }
+	    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #666;
+      font-size: 14px;
+    }
+    footer img {
+      height: 50px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Codon to Amino Acid Probability Calculator</h2>
+
+    <div class="tables">
+      <div class="codon-box">
+        <h3>Codon Table</h3>
+        <table class="codon-table">
+          <tr><th rowspan="2"></th><th colspan="2">T</th><th colspan="2">C</th><th colspan="2">A</th><th colspan="2">G</th></tr>
+          <tr style="background :#f2f2f2;"><th>Triplet</th><th>AA</th><th>Triplet</th><th>AA</th><th>Triplet</th><th>AA</th><th>Triplet</th><th>AA</th></tr>
+          <tr><th rowspan="4">T</th><td>TTT</td><td>F</td><td>TCT</td><td>S</td><td>TAT</td><td>Y</td><td>TGT</td><td>C</td></tr>
+          <tr><td>TTC</td><td>F</td><td>TCC</td><td>S</td><td>TAC</td><td>Y</td><td>TGC</td><td>C</td></tr>
+          <tr><td>TTA</td><td>L</td><td>TCA</td><td>S</td><td>TAA</td><td style="background: #ffe6e6;">*(Ochre)</td><td>TGA</td><td style="background: #ffe6e6;">*(Opal)</td></tr>
+          <tr><td>TTG</td><td>L</td><td>TCG</td><td>S</td><td>TAG</td><td style="background: #ffe6e6;">*(Amber)</td><td>TGG</td><td>W</td></tr>
+          <tr><th rowspan="4">C</th><td>CTT</td><td>L</td><td>CCT</td><td>P</td><td>CAT</td><td>H</td><td>CGT</td><td>R</td></tr>
+          <tr><td>CTC</td><td>L</td><td>CCC</td><td>P</td><td>CAC</td><td>H</td><td>CGC</td><td>R</td></tr>
+          <tr><td>CTA</td><td>L</td><td>CCA</td><td>P</td><td>CAA</td><td>Q</td><td>CGA</td><td>R</td></tr>
+          <tr><td>CTG</td><td>L</td><td>CCG</td><td>P</td><td>CAG</td><td>Q</td><td>CGG</td><td>R</td></tr>
+          <tr><th rowspan="4">A</th><td>ATT</td><td>I</td><td>ACT</td><td>T</td><td>AAT</td><td>N</td><td>AGT</td><td>S</td></tr>
+          <tr><td>ATC</td><td>I</td><td>ACC</td><td>T</td><td>AAC</td><td>N</td><td>AGC</td><td>S</td></tr>
+          <tr><td>ATA</td><td>I</td><td>ACA</td><td>T</td><td>AAA</td><td>K</td><td>AGA</td><td>R</td></tr>
+          <tr><td>ATG</td><td>M</td><td>ACG</td><td>T</td><td>AAG</td><td>K</td><td>AGG</td><td>R</td></tr>
+          <tr><th rowspan="4">G</th><td>GTT</td><td>V</td><td>GCT</td><td>A</td><td>GAT</td><td>D</td><td>GGT</td><td>G</td></tr>
+          <tr><td>GTC</td><td>V</td><td>GCC</td><td>A</td><td>GAC</td><td>D</td><td>GGC</td><td>G</td></tr>
+          <tr><td>GTA</td><td>V</td><td>GCA</td><td>A</td><td>GAA</td><td>E</td><td>GGA</td><td>G</td></tr>
+          <tr><td>GTG</td><td>V</td><td>GCG</td><td>A</td><td>GAG</td><td>E</td><td>GGG</td><td>G</td></tr>
+        </table>
+      </div>
+
+      <div class="degenerate-box">
+        <h3>Degenerate Codon Table</h3>
+        <table>
+          <tr style="background: #f2f2f2;"><th>Symbol</th><th>Represents</th></tr>
+          <tr><td style="background :#f2f2f2;">R</td><td>A or G</td></tr>
+          <tr><td style="background :#f2f2f2;">Y</td><td>C or T</td></tr>
+          <tr><td style="background :#f2f2f2;">S</td><td>G or C</td></tr>
+          <tr><td style="background :#f2f2f2;">W</td><td>A or T</td></tr>
+          <tr><td style="background :#f2f2f2;">K</td><td>G or T</td></tr>
+          <tr><td style="background :#f2f2f2;">M</td><td>A or C</td></tr>
+          <tr><td style="background :#f2f2f2;">B</td><td>C or G or T</td></tr>
+          <tr><td style="background :#f2f2f2;">D</td><td>A or G or T</td></tr>
+          <tr><td style="background :#f2f2f2;">H</td><td>A or C or T</td></tr>
+          <tr><td style="background :#f2f2f2;">V</td><td>A or C or G</td></tr>
+          <tr><td style="background :#f2f2f2;">N</td><td>A or C or G or T</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="spiked-table-section">
+        <h3>Spiked Oligo Probability Table (Enter %)</h3>
+        <table>
+          <thead>
+            <tr style="background: #f2f2f2;">
+              <th>Base</th><th>A</th><th>T</th><th>G</th><th>C</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td style="background :#f2f2f2;">a</td><td><input type="number" id="A_A" value="70"></td><td><input type="number" id="A_T" value="10"></td><td><input type="number" id="A_G" value="10"></td><td><input type="number" id="A_C" value="10"></td></tr>
+            <tr><td style="background :#f2f2f2;">t</td><td><input type="number" id="T_A" value="10"></td><td><input type="number" id="T_T" value="70"></td><td><input type="number" id="T_G" value="10"></td><td><input type="number" id="T_C" value="10"></td></tr>
+            <tr><td style="background :#f2f2f2;">g</td><td><input type="number" id="G_A" value="10"></td><td><input type="number" id="G_T" value="10"></td><td><input type="number" id="G_G" value="70"></td><td><input type="number" id="G_C" value="10"></td></tr>
+            <tr><td style="background :#f2f2f2;">c</td><td><input type="number" id="C_A" value="10"></td><td><input type="number" id="C_T" value="10"></td><td><input type="number" id="C_G" value="10"></td><td><input type="number" id="C_C" value="70"></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="input-section">
+      <label for="codonInput"><strong>Enter codon (ATC or ATc (c for spiked oligonucleotide) or NNK)</strong></label>
+      <input type="text" id="codonInput" placeholder="e.g. ATC or ATc or NNK">
+    </div>
+
+    <button onclick="calculateCodon()">Calculate</button>
+    <div id="result" class="result"></div>
+    <div style="text-align: center; margin-top: 30px;">
+  <a href="AP-000-Main.html" style="font-size: 16px; color: #007acc; text-decoration: none;">&larr; Back to Main</a>
+  </div>
+  
+  </div>
+  
+  
+    <footer>
+    <div>Copyright 2025. BIONOTE INC. Antibody Platform Design Team, Jun Sei-Yong</div>
+  </footer>
+
+  
+  <script>
+    const staticBaseProbabilities = {
+      A: {'A': 1.0}, T: {'T': 1.0}, G: {'G': 1.0}, C: {'C': 1.0},
+      N: {'A': 0.25, 'C': 0.25, 'T': 0.25, 'G': 0.25},
+      K: {'G': 0.5, 'T': 0.5}, M: {'A': 0.5, 'C': 0.5},
+      R: {'A': 0.5, 'G': 0.5}, Y: {'C': 0.5, 'T': 0.5},
+      S: {'C': 0.5, 'G': 0.5}, W: {'A': 0.5, 'T': 0.5},
+      B: {'C': 1/3, 'G': 1/3, 'T': 1/3}, D: {'A': 1/3, 'G': 1/3, 'T': 1/3},
+      H: {'A': 1/3, 'C': 1/3, 'T': 1/3}, V: {'A': 1/3, 'C': 1/3, 'G': 1/3}
+    };
+
+    const codonTable = {
+      'ATA': 'I', 'ATC': 'I', 'ATT': 'I', 'ATG': 'M', 'ACA': 'T', 'ACC': 'T', 'ACG': 'T', 'ACT': 'T',
+      'AAC': 'N', 'AAT': 'N', 'AAA': 'K', 'AAG': 'K', 'AGC': 'S', 'AGT': 'S', 'AGA': 'R', 'AGG': 'R',
+      'CTA': 'L', 'CTC': 'L', 'CTG': 'L', 'CTT': 'L', 'CCA': 'P', 'CCC': 'P', 'CCG': 'P', 'CCT': 'P',
+      'CAC': 'H', 'CAT': 'H', 'CAA': 'Q', 'CAG': 'Q', 'CGA': 'R', 'CGC': 'R', 'CGG': 'R', 'CGT': 'R',
+      'GTA': 'V', 'GTC': 'V', 'GTG': 'V', 'GTT': 'V', 'GCA': 'A', 'GCC': 'A', 'GCG': 'A', 'GCT': 'A',
+      'GAC': 'D', 'GAT': 'D', 'GAA': 'E', 'GAG': 'E', 'GGA': 'G', 'GGC': 'G', 'GGG': 'G', 'GGT': 'G',
+      'TCA': 'S', 'TCC': 'S', 'TCG': 'S', 'TCT': 'S', 'TTC': 'F', 'TTT': 'F', 'TTA': 'L', 'TTG': 'L',
+      'TAC': 'Y', 'TAT': 'Y', 'TAA': '*', 'TAG': '*', 'TGC': 'C', 'TGT': 'C', 'TGA': '*', 'TGG': 'W'
+    };
+
+    function getUserDefinedProbabilities() {
+      const bases = ["A'", "T'", "G'", "C'"];
+      const letters = ['A', 'T', 'G', 'C'];
+      const result = {};
+      for (const base of bases) {
+        result[base] = {};
+        let total = 0;
+        for (const letter of letters) {
+          const value = parseFloat(document.getElementById(`${base[0]}_${letter}`).value) || 0;
+          result[base][letter] = value;
+          total += value;
+        }
+        for (const letter of letters) {
+          result[base][letter] = result[base][letter] / total;
+        }
+      }
+      return result;
+    }
+
+    function generateCodons(parts, probs) {
+      const combos = [];
+      const keys1 = Object.entries(probs[parts[0]]);
+      const keys2 = Object.entries(probs[parts[1]]);
+      const keys3 = Object.entries(probs[parts[2]]);
+      for (const [b1, p1] of keys1) {
+        for (const [b2, p2] of keys2) {
+          for (const [b3, p3] of keys3) {
+            combos.push([b1 + b2 + b3, p1 * p2 * p3]);
+          }
+        }
+      }
+      return combos;
+    }
+
+    function calculateCodon() {
+      let input = document.getElementById('codonInput').value.trim();
+      const resultDiv = document.getElementById('result');
+      if (input.length !== 3) {
+        resultDiv.innerText = '❌ Please enter exactly 3 characters.';
+        return;
+      }
+      const codonParts = Array.from(input).map(c => {
+        if (c === c.toUpperCase()) return c;
+        if (c === 'a') return "A'";
+        if (c === 't') return "T'";
+        if (c === 'g') return "G'";
+        if (c === 'c') return "C'";
+        return c.toUpperCase();
+      });
+      const custom = getUserDefinedProbabilities();
+      const baseProbs = { ...staticBaseProbabilities, ...custom };
+      if (!codonParts.every(part => baseProbs[part])) {
+        resultDiv.innerText = '❌ Invalid base detected.';
+        return;
+      }
+      const combos = generateCodons(codonParts, baseProbs);
+      const aaCounts = {};
+      let total = 0;
+      for (const [codon, prob] of combos) {
+        const aa = codonTable[codon] || '?';
+        aaCounts[aa] = (aaCounts[aa] || 0) + prob;
+        total += prob;
+      }
+      const stopCount = aaCounts['*'] ? 1 : 0;
+      const aaCount = Object.keys(aaCounts).length - stopCount;
+      let output = `입력된 코돈: ${input}\n\n가능한 아미노산 및 확률 (${aaCount}개${stopCount ? ' + Stop codon' : ''}):\n`;
+      for (const [aa, prob] of Object.entries(aaCounts).sort((a, b) => b[1] - a[1])) {
+        const line = aa === '*' ? `<span class="stop">  * (Stop): ${(prob / total * 100).toFixed(2)}%</span>` : `  ${aa}: ${(prob / total * 100).toFixed(2)}%`;
+        output += line + '\n';
+      }
+      resultDiv.innerHTML = output;
+    }
+  </script>
+</body>
+</html>

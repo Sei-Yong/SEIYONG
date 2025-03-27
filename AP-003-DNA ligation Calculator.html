@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DNA Ligation Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 40px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    table { border-collapse: collapse; margin-bottom: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: center; }
+    .gray { background-color: #ddd; }
+    .yellow { background-color: #ffff99; }
+    input[type="number"] { width: 100px; }
+	.flex-container {
+display: flex;
+gap: 20px; /* 테이블 사이 간격 */
+justify-content: center; /* 가운데 정렬 */
+flex-wrap: wrap; /* 화면 작으면 줄바꿈 */
+}
+    footer {
+      text-align: center;
+      margin-top: 10px;
+      color: #666;
+      font-size: 14px;
+    }
+    footer img {
+      height: 50px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2 style="text-align: center";>DNA Ligation Calculator</h2>
+<div class="flex-container">
+  <table style="margin-top: 20px;">
+    <tr><th colspan="3">Information</th><th>Insert</th><th>Vector</th></tr>
+    <tr>
+      <td colspan="3">DNA size (bp)</td>
+      <td><input type="number" id="insertSize" class="yellow"></td>
+      <td><input type="number" id="vectorSize" class="yellow"></td>
+    </tr>
+    <tr>
+      <td colspan="3">DNA concentration (ng/uL)</td>
+      <td><input type="number" id="insertConc" class="yellow"></td>
+      <td><input type="number" id="vectorConc" class="yellow"></td>
+    </tr>
+  </table>
+  </div>
+<div class="flex-container">
+  <table>
+    <tr><th colspan="2">DNA Ligation (uL)</th></tr>
+    <tr>
+      <td>Insert</td>
+      <td id="d9"></td>
+    </tr>
+    <tr>
+      <td>Vector</td>
+      <td id="d10"></td>
+    </tr>
+  </table>
+
+  <table>
+    <tr><th colspan="2">DNA ligation (10uL)</th></tr>
+    <tr><td>Insert</td><td id="g9"></td></tr>
+    <tr><td>Vector</td><td id="g10"></td></tr>
+    <tr><td>T4 ligase</td><td>1</td></tr>
+    <tr><td>10X buffer</td><td>1</td></tr>
+    <tr><td>UPW</td><td id="g13"></td></tr>
+  </table>
+
+  <table>
+    <tr><th colspan="2">DNA ligation (&gt; 10uL)</th></tr>
+    <tr><td>Insert</td><td id="j9"></td></tr>
+    <tr><td>Vector</td><td id="j10"></td></tr>
+    <tr><td>T4 ligase</td><td id="j11"></td></tr>
+    <tr><td>10X buffer</td><td id="j12"></td></tr>
+    <tr><td>Total volume</td><td id="j13" style="font-weight:bold"></td></tr>
+  </table>
+</div>
+<div style="text-align: center; margin-top: 30px;">
+  <a href="AP-000-Main.html" style="font-size: 16px; color: #007acc; text-decoration: none;">&larr; Back to Main</a>
+</div>
+</div>
+  <footer>
+    <div>Copyright 2025. BIONOTE INC. Antibody Platform Design Team, Jun Sei-Yong</div>
+  </footer>
+
+  <script>
+    function calculate() {
+      const insertSize = parseFloat(document.getElementById('insertSize').value);
+      const insertConc = parseFloat(document.getElementById('insertConc').value);
+      const vectorSize = parseFloat(document.getElementById('vectorSize').value);
+      const vectorConc = parseFloat(document.getElementById('vectorConc').value);
+
+      let d9 = "", d10 = "";
+
+      if (insertSize && insertConc) {
+        d9 = 0.14 / (insertConc / 1000 * 1515 / insertSize);
+      }
+      if (vectorSize && vectorConc) {
+        d10 = 0.02 / (vectorConc / 1000 * 1515 / vectorSize);
+      }
+
+      d9 = isFinite(d9) ? d9 : "";
+      d10 = isFinite(d10) ? d10 : "";
+
+      document.getElementById('d9').textContent = d9.toFixed(2);
+      document.getElementById('d10').textContent = d10.toFixed(2);
+      document.getElementById('g9').textContent = d9.toFixed(2);
+      document.getElementById('g10').textContent = d10.toFixed(2);
+      document.getElementById('j9').textContent = d9.toFixed(2);
+      document.getElementById('j10').textContent = d10.toFixed(2);
+
+      let gTotal = d9 + d10 + 1 + 1;
+      let g13 = (gTotal === 8) ? "" : (10 - gTotal);
+      document.getElementById('g13').textContent = g13 ? g13.toFixed(2) : "";
+
+      let j11 = "";
+      if (gTotal >= 10 && gTotal <= 15) j11 = 1.5;
+      else if (gTotal <= 20) j11 = 2;
+      else if (gTotal <= 25) j11 = 2.5;
+      else if (gTotal <= 30) j11 = 3;
+      else if (gTotal <= 35) j11 = 3.5;
+      else if (gTotal <= 40) j11 = 4;
+
+      document.getElementById('j11').textContent = j11;
+
+      let j12 = (d9 + d10 + j11) / 9;
+      document.getElementById('j12').textContent = isFinite(j12) ? j12.toFixed(2) : "";
+      let j13 = d9 + d10 + j11 + j12;
+      document.getElementById('j13').textContent = isFinite(j13) ? j13.toFixed(2) : "";
+    }
+
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('input', calculate);
+    });
+  </script>
+</body>
+</html>
