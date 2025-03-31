@@ -69,9 +69,10 @@
     <div class="result" id="basicTm"></div>
     <div class="result" id="gcContent"></div>
     <div class="result" id="primerLength"></div>
-	<div style="text-align: center; margin-top: 30px;">
-  <a href="AP-000-Main.html" style="font-size: 16px; color: #007acc; text-decoration: none;">&larr; Back to Main</a>
-  </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+      <a href="AP-000-Main.html" style="font-size: 16px; color: #007acc; text-decoration: none;">&larr; Back to Main</a>
+    </div>
   </div>
 
   <footer>
@@ -97,7 +98,7 @@
     };
 
     function calculateBasicTm() {
-      const inputSeq = document.getElementById('sequence').value.toUpperCase();
+      const inputSeq = document.getElementById('sequence').value.toUpperCase().replace(/\s+/g, '');
       const sequences = expandDegenerate(inputSeq);
 
       if (sequences.length === 0) {
@@ -161,7 +162,7 @@
     }
 
     function swapStrands() {
-      const input = document.getElementById('sequence').value.toUpperCase();
+      const input = document.getElementById('sequence').value.toUpperCase().replace(/\s+/g, '');
       let complement = '';
       for (let i = input.length - 1; i >= 0; i--) {
         const base = input[i];
