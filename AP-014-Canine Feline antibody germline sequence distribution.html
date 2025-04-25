@@ -45,24 +45,23 @@
     .fr      { background-color: #3b82f6; }
     .vernier { background-color: #10b981; }
     .packing { background-color: #f59e0b; }
-	
-	.kabat-grid .cdr { background-color: #f43f5e; }
-    .kabat-grid .fr  { background-color: #3b82f6; }
-    .kabat-grid .vernier { background-color: #10b981; }
-    .kabat-grid .packing { background-color: #f59e0b; }
-    .kabat-grid div:hover {
-      background-color: #bbb;
-    }
 
     .kabat-grid {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+      flex-direction: column;
+      align-items: center;
       gap: 6px;
       margin-bottom: 2rem;
     }
 
-    .kabat-grid div {
+    .kabat-row {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .kabat-row div {
       background-color: #e2e8f0;
       border-radius: 6px;
       padding: 6px 10px;
@@ -71,15 +70,20 @@
       transition: background 0.2s;
     }
 
-    .kabat-grid div:hover {
+    .kabat-row div:hover {
       background-color: #cbd5e1;
     }
+
+    .kabat-row .cdr     { background-color: #f43f5e; }
+    .kabat-row .fr      { background-color: #3b82f6; }
+    .kabat-row .vernier { background-color: #10b981; }
+    .kabat-row .packing { background-color: #f59e0b; }
 
     canvas {
       max-width: 800px;
       margin: 0 auto;
       display: block;
-	}
+    }
 
     footer {
       text-align: center;
@@ -87,6 +91,7 @@
       color: #666;
       font-size: 14px;
     }
+
     footer img {
       height: 50px;
       margin-bottom: 10px;
@@ -108,7 +113,7 @@
     <select id="chainSelector">
       <option value="IGHV">IGH</option>
       <option value="IGKV">IGK</option>
-      <option value="IGLV">IGL</option>	  
+      <option value="IGLV">IGL</option>
     </select>
   </div>
 
@@ -120,22 +125,21 @@
   </div>
 
   <div class="kabat-grid" id="positionGrid">
-    <!-- Kabat positions will be dynamically inserted here -->
+    <!-- Kabat position rows will be dynamically inserted here -->
   </div>
 
   <canvas id="aaChart" width="800" height="400"></canvas>
 
-<div style="text-align: center; margin-top: 30px;">
-  <a href="AP-000-Main.html" style="font-size: 16px; color: #007acc; text-decoration: none;">&larr; Back to Main</a>
-</div>
-</div>
+  <div style="text-align: center; margin-top: 30px;">
+    <a href="AP-000-Main.html" style="font-size: 16px; color: #007acc; text-decoration: none;">&larr; Back to Main</a>
+  </div>
+
   <footer>
     <div>Copyright 2025. BIONOTE INC. Antibody Platform Design Team, Jun Sei-Yong</div>
   </footer>
 
   <script>
-  
-	const regionMap = {
+    const regionMap = {
 	  H1: 'fr', H2: 'vernier', H3: 'fr', H4: 'packing', H5: 'fr', H6: 'packing', H7: 'fr', H8: 'fr', H9: 'packing',
       H10: 'fr', H11: 'fr', H12: 'fr', H13: 'fr', H14: 'fr', H15: 'fr', H16: 'fr', H17: 'fr', H18: 'fr', H19: 'fr',
       H20: 'packing', H21: 'fr', H22: 'packing', H23: 'fr', H24: 'packing', H25: 'fr', H26: 'fr', H27: 'vernier',
@@ -162,11 +166,10 @@
       L80: 'fr', L81: 'fr', L82: 'packing', L83: 'fr', L84: 'fr', L85: 'fr', L86: 'packing', L87: 'packing', L88: 'packing', L89: 'cdr',
       L90: 'cdr', L91: 'cdr', L92: 'cdr', L93: 'cdr', L94: 'cdr', L95: 'cdr', L96: 'cdr', L97: 'cdr', L98: 'vernier', L99: 'packing',
 	  L100: 'fr', L101: 'packing', L102: 'packing', L103: 'fr', L104: 'packing', L105: 'fr', L106: 'packing', L107: 'fr', L108: 'fr'
-	  };
-	  
-    // 🔽 여기에 JSON 데이터를 채워 넣으세요 (예시 구조 포함)
+	}; // 이 자리에 실제 regionMap JSON 삽입
+	
     const aaDataSets = {
-      "feline": {
+	      "feline": {
         "IGHV": {
 H1: { A: 0, C: 0, D: 50, E: 1, F: 0, G: 0, H: 0, I: 0, K: 0, L: 0, M: 0, N: 0, P: 0, Q: 20, R: 0, S: 0, T: 0, V: 0, W: 0, Y: 0 },
 H2: { A: 1, C: 0, D: 0, E: 1, F: 3, G: 0, H: 0, I: 0, K: 0, L: 12, M: 0, N: 0, P: 1, Q: 0, R: 0, S: 0, T: 0, V: 53, W: 0, Y: 0 },
@@ -863,33 +866,56 @@ L106: { A: 0, C: 0, D: 0, E: 0, F: 0, G: 0, H: 0, I: 1, K: 0, L: 0, M: 0, N: 0, 
 L107: { A: 0, C: 0, D: 0, E: 0, F: 0, G: 0, H: 0, I: 0, K: 0, L: 9, M: 0, N: 0, P: 0, Q: 0, R: 0, S: 0, T: 0, V: 0, W: 0, Y: 0 }
         }
       }
-    };
+	}; // 이 자리에 실제 aaDataSets JSON 삽입
+    const kabatPositionGroups = [
+      ['H1','H2','H3','H4','H5','H6','H7','H8','H9','H10','H11','H12','H13','H14','H15','H16','H17','H18','H19','H20','H21','H22','H23','H24','H25','H26','H27','H28','H29'],
+      ['H30','H31','H32','H33','H34','H35','H35A'],
+      ['H36','H37','H38','H39','H40','H41','H42','H43','H44','H45','H46','H47','H48','H49'],
+      ['H50','H51','H52','H52A','H53','H54','H55','H56','H57','H58','H59','H60','H61','H62','H63','H64','H65'],
+      ['H66','H67','H68','H69','H70','H71','H72','H73','H74','H75','H76','H77','H78','H79','H80','H81','H82','H82A','H82B','H82C','H83','H84','H85','H86','H87','H88','H89','H90','H91','H92','H93','H94'],
+      ['H101','H102','H103','H104','H105','H106','H107','H108','H109','H110','H111','H112','H113'],
+      ['L1','L2','L3','L4','L5','L6','L7','L8','L9','L10','L11','L12','L13','L14','L15','L16','L17','L18','L19','L20','L21','L22','L23'],
+      ['L24','L25','L26','L27','L28','L29','L30','L31','L32','L33','L34'],
+      ['L35','L36','L37','L38','L39','L40','L41','L42','L43','L44','L45','L46','L47','L48','L49'],
+      ['L50','L51','L52','L53','L54','L55','L56'],
+      ['L57','L58','L59','L60','L61','L62','L63','L64','L65','L66','L67','L68','L69','L70','L71','L72','L73','L74','L75','L76','L77','L78','L79','L80','L81','L82','L82A','L82B','L82C','L83','L84','L85','L86','L87','L88','L89'],
+      ['L96','L97','L98','L99','L100','L101','L102','L103','L104','L105','L106','L107','L108']
+    ];
 
-    // 포지션 그리드 동적 생성
-  function updateGrid() {
+    function updateGrid() {
   const species = document.getElementById("speciesSelector").value;
   const chain = document.getElementById("chainSelector").value;
   const data = aaDataSets[species]?.[chain] || {};
   const grid = document.getElementById("positionGrid");
   grid.innerHTML = '';
 
-  Object.keys(data).forEach(pos => {
-    const btn = document.createElement("div");
-    btn.textContent = pos;
+  kabatPositionGroups.forEach(group => {
+    const row = document.createElement("div");
+    row.classList.add("kabat-row");
 
-    // regionMap에서 region 가져오기
-    const region = regionMap[pos];
-    if (region) {
-      btn.dataset.region = region;
-      btn.classList.add(region);  // 예: cdr, fr, vernier, packing
+    group.forEach(pos => {
+      if (!data[pos]) return;  // 데이터 없으면 skip
+
+      const btn = document.createElement("div");
+      btn.textContent = pos;
+
+      const region = regionMap[pos];
+      if (region) {
+        btn.dataset.region = region;
+        btn.classList.add(region);
+      }
+
+      btn.onclick = () => drawChart(data[pos], pos);
+      row.appendChild(btn);
+    });
+
+    // ✅ 버튼이 하나라도 있는 줄만 추가
+    if (row.childElementCount > 0) {
+      grid.appendChild(row);
     }
+  });
+}
 
-    btn.onclick = () => drawChart(data[pos], pos);
-    grid.appendChild(btn);
-      });
-    }
-
-    // Chart.js 시각화 함수
     let chart;
     function drawChart(frequency, position) {
       const ctx = document.getElementById("aaChart").getContext("2d");
@@ -924,13 +950,9 @@ L107: { A: 0, C: 0, D: 0, E: 0, F: 0, G: 0, H: 0, I: 0, K: 0, L: 9, M: 0, N: 0, 
       });
     }
 
-    // 초기 로딩
     document.getElementById("speciesSelector").onchange = updateGrid;
     document.getElementById("chainSelector").onchange = updateGrid;
     window.onload = updateGrid;
-	
-	
   </script>
-
 </body>
 </html>
