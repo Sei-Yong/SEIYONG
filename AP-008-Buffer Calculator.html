@@ -28,8 +28,8 @@
     <option value="phosphate">Phosphate Buffer</option>
     <option value="acetate">Acetate Buffer</option>
     <option value="histidine">Histidine-Acetate Buffer</option>
-    <option value="citrate">Citrate Buffer</option>
     <option value="goods">Good's Buffer</option>
+    <option value="citrate">Citrate Buffer</option>
   </select>
 </div>
 
@@ -53,7 +53,7 @@
       <td><input type="number" id="pH" class="yellow" step="0.01" value="7.40" min="2" max="12"></td>
     </tr>
     <tr id="pHRangeRow" style="display:none;">
-      <th>Recommended pH Range (Adjust with HCl or NaOH)</th>
+      <th>Recommended pH Range (Good's buffer)</th>
       <td id="pHRangeText">–</td>
     </tr>
     <tr>
@@ -104,7 +104,11 @@ function updateBufferForm() {
   document.getElementById("pHRangeRow").style.display = (type === "goods") ? "table-row" : "none";
   document.getElementById("NaClRow").style.display = (type === "phosphate") ? "table-row" : "none";
   document.getElementById("KClRow").style.display = (type === "phosphate") ? "table-row" : "none";
-  if (type !== "goods") updateGoodsDefault();
+  if (type !== "goods") {
+    document.getElementById("pHRangeText").textContent = "–";
+  } else {
+    updateGoodsDefault();
+  }
 }
 
 function updateGoodsDefault() {
@@ -115,7 +119,50 @@ function updateGoodsDefault() {
   }
 }
 
+function validateBufferConditions() {
+  const pH = parseFloat(document.getElementById("pH").value);
+  const strength_mM = parseFloat(document.getElementById("strength").value);
+  const type = document.getElementById("bufferType").value;
+  let warnings = [];
+
+  if (type === "phosphate") {
+    if (pH < 6.2 || pH > 8.2) {
+      warnings.push("Warning: Phosphate buffer is most effective between pH 6.2–8.2");
+    }
+  } else if (type === "acetate") {
+    if (pH < 4.0 || pH > 6.0) {
+      warnings.push("Warning: Acetate buffer is most effective between pH 4.0–6.0");
+    }
+  } else if (type === "histidine") {
+    if (pH < 5.5 || pH > 7.0) {
+      warnings.push("Warning: Histidine-acetate buffer is most effective between pH 5.5–7.0");
+    }
+  } else if (type === "citrate") {
+    if (pH < 3.0 || pH > 6.2) {
+      warnings.push("Warning: Citrate buffer is most effective between pH 3.0–6.2");
+    }
+  }
+  // Good's buffer는 pH 경고 없음
+
+  if (strength_mM < 10) {
+    warnings.push("Warning: Buffer strength is very low (<10 mM)");
+  }
+  if (strength_mM > 500) {
+    warnings.push("Warning: Buffer strength is very high (>500 mM)");
+  }
+
+  const warningContainer = document.getElementById("warningContainer");
+  if (warnings.length > 0) {
+    warningContainer.innerHTML = warnings.map(w => `<div class="warning-alert">${w}</div>`).join('');
+    warningContainer.style.display = 'block';
+  } else {
+    warningContainer.style.display = 'none';
+  }
+}
+
 function calculateBuffer() {
+  validateBufferConditions();
+
   const type = document.getElementById("bufferType").value;
   const pH = parseFloat(document.getElementById("pH").value);
   const strength_mM = parseFloat(document.getElementById("strength").value);
@@ -165,7 +212,7 @@ function calculateBuffer() {
     const buffer = document.getElementById("goodsBufferSelect").value;
     const mw = goodsBufferData[buffer].mw;
     const gL = (strength_mM / 1000) * mw;
-    html += `<tr><td>${buffer} (${mw})</td><td>${strength_mM.toFixed(1)} mM</td><td>${gL.toFixed(3)} g/L</td><td>–</td></tr>`;
+    html += `<tr><td>${buffer} (${mw}g/mol)</td><td>${strength_mM.toFixed(1)} mM</td><td>${gL.toFixed(3)} g/L</td><td>–</td></tr>`;
   } else if (type === "citrate") {
     const pKa = 6.4;
     const MW_acid = 192.12, MW_base = 294.10;
