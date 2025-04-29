@@ -15,6 +15,7 @@
   footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }
 </style>
 </head>
+
 <body>
 <div class="container">
 <h2 class="center">Buffer Calculator</h2>
@@ -28,6 +29,7 @@
     <option value="acetate">Acetate Buffer</option>
     <option value="histidine">Histidine-Acetate Buffer</option>
     <option value="goods">Good's Buffer</option>
+    <option value="citrate">Citrate Buffer</option> <!-- 추가 -->
   </select>
 </div>
 
@@ -67,15 +69,18 @@
       <td><input type="number" id="KCl" class="yellow" step="0.1" value="2.7" min="0"></td>
     </tr>
   </table>
+
   <div class="center">
     <button onclick="calculateBuffer()">Calculate Buffer</button>
   </div>
 </div>
 
 <div id="results"></div>
-<div style="text-align: center; margin-top: 30px;">
+
+<div class="center" style="margin-top: 30px;">
   <a href="AP-000-Main.html" style="font-size: 16px; color: #007acc; text-decoration: none;">&larr; Back to Main</a>
 </div>
+
 </div>
 
 <footer>
@@ -119,7 +124,7 @@ function calculateBuffer() {
   if (type === "phosphate") {
     const NaCl_mM = parseFloat(document.getElementById("NaCl").value);
     const KCl_mM = parseFloat(document.getElementById("KCl").value);
-    const MW_NaH2PO4 = 156.01, MW_Na2HPO4 = 141, MW_NaCl = 58.44, MW_KCl = 74.55;
+    const MW_NaH2PO4 = 156.01, MW_Na2HPO4 = 141.00, MW_NaCl = 58.44, MW_KCl = 74.55;
     const pKa2 = 7.20;
     const ratio = Math.pow(10, pH - pKa2);
     const base_mM = (ratio / (1 + ratio)) * strength_mM;
@@ -128,10 +133,10 @@ function calculateBuffer() {
     const base_gL = base_mM / 1000 * MW_Na2HPO4;
     const NaCl_gL = NaCl_mM / 1000 * MW_NaCl;
     const KCl_gL = KCl_mM / 1000 * MW_KCl;
-    html += `<tr><td>Monosodium phosphate</td><td>${acid_mM.toFixed(2)} mM</td><td>${acid_gL.toFixed(2)} g/L</td><td>–</td></tr>`;
-    html += `<tr><td>Disodium phosphate</td><td>${base_mM.toFixed(2)} mM</td><td>${base_gL.toFixed(2)} g/L</td><td>–</td></tr>`;
-    html += `<tr><td>NaCl</td><td>${NaCl_mM.toFixed(2)} mM</td><td>${NaCl_gL.toFixed(2)} g/L</td><td>–</td></tr>`;
-    html += `<tr><td>KCl</td><td>${KCl_mM.toFixed(2)} mM</td><td>${KCl_gL.toFixed(2)} g/L</td><td>–</td></tr>`;
+    html += `<tr><td>Monosodium phosphate (156.01g/mol)</td><td>${acid_mM.toFixed(2)} mM</td><td>${acid_gL.toFixed(2)} g/L</td><td>–</td></tr>`;
+    html += `<tr><td>Disodium phosphate (141.00g/mol)</td><td>${base_mM.toFixed(2)} mM</td><td>${base_gL.toFixed(2)} g/L</td><td>–</td></tr>`;
+    html += `<tr><td>NaCl (58.44g/mol)</td><td>${NaCl_mM.toFixed(2)} mM</td><td>${NaCl_gL.toFixed(2)} g/L</td><td>–</td></tr>`;
+    html += `<tr><td>KCl (74.55g/mol)</td><td>${KCl_mM.toFixed(2)} mM</td><td>${KCl_gL.toFixed(2)} g/L</td><td>–</td></tr>`;
   } else if (type === "acetate") {
     const pKa = 4.76;
     const MW_acid = 60.05, MW_base = 136.08;
@@ -142,8 +147,8 @@ function calculateBuffer() {
     const base_gL = base_mM / 1000 * MW_base;
     const acid_gL = acid_mM / 1000 * MW_acid;
     const acid_mL = acid_mM / 1000 / acidStockM * 1000;
-    html += `<tr><td>Acetic acid</td><td>${acid_mM.toFixed(2)} mM</td><td>${acid_gL.toFixed(3)} g/L</td><td>${acid_mL.toFixed(2)} mL/L</td></tr>`;
-    html += `<tr><td>Sodium acetate</td><td>${base_mM.toFixed(2)} mM</td><td>${base_gL.toFixed(3)} g/L</td><td>–</td></tr>`;
+    html += `<tr><td>Acetic acid (60.05g/mol)</td><td>${acid_mM.toFixed(2)} mM</td><td>${acid_gL.toFixed(3)} g/L</td><td>${acid_mL.toFixed(2)} mL/L</td></tr>`;
+    html += `<tr><td>Sodium acetate (136.08g/mol)</td><td>${base_mM.toFixed(2)} mM</td><td>${base_gL.toFixed(3)} g/L</td><td>–</td></tr>`;
   } else if (type === "histidine") {
     const pKa = 6.00;
     const MW_His = 155.16, MW_AcOH = 60.05;
@@ -154,13 +159,23 @@ function calculateBuffer() {
     const his_gL = his_mM / 1000 * MW_His;
     const acetic_gL = acetic_mM / 1000 * MW_AcOH;
     const acetic_mL = acetic_mM / 1000 / AcOH_stock_M * 1000;
-    html += `<tr><td>L-Histidine</td><td>${his_mM.toFixed(2)} mM</td><td>${his_gL.toFixed(3)} g/L</td><td>–</td></tr>`;
-    html += `<tr><td>Acetic acid</td><td>${acetic_mM.toFixed(2)} mM</td><td>${acetic_gL.toFixed(3)} g/L</td><td>${acetic_mL.toFixed(2)} mL/L</td></tr>`;
+    html += `<tr><td>L-Histidine (155.16g/mol)</td><td>${his_mM.toFixed(2)} mM</td><td>${his_gL.toFixed(3)} g/L</td><td>–</td></tr>`;
+    html += `<tr><td>Acetic acid (60.05g/mol)</td><td>${acetic_mM.toFixed(2)} mM</td><td>${acetic_gL.toFixed(3)} g/L</td><td>${acetic_mL.toFixed(2)} mL/L</td></tr>`;
   } else if (type === "goods") {
     const buffer = document.getElementById("goodsBufferSelect").value;
     const mw = goodsBufferData[buffer].mw;
     const gL = (strength_mM / 1000) * mw;
-    html += `<tr><td>${buffer}</td><td>${strength_mM.toFixed(1)} mM</td><td>${gL.toFixed(3)} g/L</td><td>–</td></tr>`;
+    html += `<tr><td>${buffer} (${mw})</td><td>${strength_mM.toFixed(1)} mM</td><td>${gL.toFixed(3)} g/L</td><td>–</td></tr>`;
+  } else if (type === "citrate") {
+    const pKa = 6.4;
+    const MW_acid = 192.12, MW_base = 294.10;
+    const ratio = Math.pow(10, pH - pKa);
+    const base_mM = (ratio / (1 + ratio)) * strength_mM;
+    const acid_mM = strength_mM - base_mM;
+    const base_gL = base_mM / 1000 * MW_base;
+    const acid_gL = acid_mM / 1000 * MW_acid;
+    html += `<tr><td>Citric acid (192.12g/mol)</td><td>${acid_mM.toFixed(2)} mM</td><td>${acid_gL.toFixed(3)} g/L</td><td>–</td></tr>`;
+    html += `<tr><td>Trisodium citrate dihydrate (294.10g/mol)</td><td>${base_mM.toFixed(2)} mM</td><td>${base_gL.toFixed(3)} g/L</td><td>–</td></tr>`;
   }
 
   html += `</table>`;
@@ -169,5 +184,6 @@ function calculateBuffer() {
 
 window.onload = () => updateBufferForm();
 </script>
+
 </body>
 </html>
