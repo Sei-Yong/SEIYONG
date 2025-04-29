@@ -1,225 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Buffer Calculator</title>
-  <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      background: #f4f4f4; 
-      margin: 0; 
-      padding: 40px; 
-    }
-    .container {
-      max-width: 900px;
-      margin: auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    select, input[type="number"] { 
-      width: 150px; 
-      margin: 5px 0; 
-      padding: 5px;
-    }
-    table { 
-      border-collapse: collapse; 
-      width: 100%; 
-      margin-top: 20px; 
-    }
-    th, td { 
-      border: 1px solid #ccc; 
-      padding: 8px 12px; 
-      text-align: center; 
-    }
-    .yellow { background-color: #ffff99; }
-    .center { text-align: center; margin-top: 20px; }
-    .warning-alert {
-      background-color: #fff3cd;
-      color: #856404;
-      border: 1px solid #ffeeba;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 4px;
-    }
-    footer {
-      text-align: center;
-      margin-top: 30px;
-      color: #666;
-      font-size: 14px;
-    }
-    .info-tooltip {
-      position: relative;
-      display: inline-block;
-      border-bottom: 1px dotted black;
-      cursor: help;
-    }
-    .info-tooltip .tooltiptext {
-      visibility: hidden;
-      width: 250px;
-      background-color: #555;
-      color: #fff;
-      text-align: center;
-      border-radius: 6px;
-      padding: 5px;
-      position: absolute;
-      z-index: 1;
-      bottom: 125%;
-      left: 50%;
-      margin-left: -125px;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    .info-tooltip:hover .tooltiptext {
-      visibility: visible;
-      opacity: 1;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Buffer Calculator</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 40px; }
+  .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+  select, input[type="number"] { width: 150px; margin: 5px 0; padding: 5px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+  th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: center; }
+  .yellow { background-color: #ffff99; }
+  .center { text-align: center; margin-top: 20px; }
+  .warning-alert { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 10px; margin: 10px 0; border-radius: 4px; }
+  footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }
+</style>
 </head>
 <body>
 <div class="container">
-  <h2 class="center">Buffer Calculator</h2>
+<h2 class="center">Buffer Calculator</h2>
 
-  <div id="warningContainer" style="display:none;"></div>
+<div id="warningContainer" style="display:none;"></div>
 
+<div class="center">
+  <label for="bufferType">Select Buffer Type: </label>
+  <select id="bufferType" class="yellow" onchange="updateBufferForm()">
+    <option value="phosphate">Phosphate Buffer</option>
+    <option value="acetate">Acetate Buffer</option>
+    <option value="histidine">Histidine-Acetate Buffer</option>
+    <option value="goods">Good's Buffer</option>
+  </select>
+</div>
+
+<div id="commonInputs" class="center">
+  <table>
+    <tr id="goodsBufferRow" style="display:none;">
+      <th>Select Good's Buffer</th>
+      <td>
+        <select id="goodsBufferSelect" class="yellow" onchange="updateGoodsDefault()">
+          <option value="HEPES">HEPES</option>
+          <option value="MES">MES</option>
+          <option value="MOPS">MOPS</option>
+          <option value="PIPES">PIPES</option>
+          <option value="Tricine">Tricine</option>
+          <option value="TAPS">TAPS</option>
+        </select>
+      </td>
+    </tr>
+    <tr id="pHRow">
+      <th>Target pH</th>
+      <td><input type="number" id="pH" class="yellow" step="0.01" value="7.40" min="2" max="12"></td>
+    </tr>
+    <tr id="pHRangeRow" style="display:none;">
+      <th>Recommended pH Range (Adjust with HCl or NaOH)</th>
+      <td id="pHRangeText">–</td>
+    </tr>
+    <tr>
+      <th>Buffer Strength (mM)</th>
+      <td><input type="number" id="strength" class="yellow" step="0.1" value="100" min="10" max="500"></td>
+    </tr>
+    <tr id="NaClRow">
+      <th>NaCl Concentration (mM)</th>
+      <td><input type="number" id="NaCl" class="yellow" step="0.1" value="137" min="0"></td>
+    </tr>
+    <tr id="KClRow">
+      <th>KCl Concentration (mM)</th>
+      <td><input type="number" id="KCl" class="yellow" step="0.1" value="2.7" min="0"></td>
+    </tr>
+  </table>
   <div class="center">
-    <label for="bufferType">Select Buffer Type: </label>
-    <select id="bufferType" class="yellow" onchange="updateBufferForm()">
-      <option value="phosphate">Phosphate Buffer</option>
-      <option value="acetate">Acetate Buffer</option>
-      <option value="histidine">Histidine-Acetate Buffer</option>
-    </select>
+    <button onclick="calculateBuffer()">Calculate Buffer</button>
   </div>
+</div>
 
-  <div id="commonInputs" class="center">
-    <table>
-      <tr>
-        <th>Target pH 
-          <span class="info-tooltip">ℹ️
-            <span class="tooltiptext">Desired pH of the buffer solution. Different buffer types have optimal ranges.</span>
-          </span>
-        </th>
-        <td><input type="number" id="pH" class="yellow" step="0.01" value="7.40" min="2" max="12"></td>
-      </tr>
-      <tr>
-        <th>Buffer Strength (mM) 
-          <span class="info-tooltip">ℹ️
-            <span class="tooltiptext">Concentration of buffer components. Typically 10-500 mM.</span>
-          </span>
-        </th>
-        <td><input type="number" id="strength" class="yellow" step="0.1" value="100" min="10" max="500"></td>
-      </tr>
-      <tr id="NaClRow">
-        <th>NaCl Concentration (mM)</th>
-        <td><input type="number" id="NaCl" class="yellow" step="0.1" value="137" min="0"></td>
-      </tr>
-      <tr id="KClRow">
-        <th>KCl Concentration (mM)</th>
-        <td><input type="number" id="KCl" class="yellow" step="0.1" value="2.7" min="0"></td>
-      </tr>
-    </table>
-    <div class="center">
-      <button onclick="calculateBuffer()">Calculate Buffer</button>
-    </div>
-  </div>
-
-  <div id="results"></div>
-  	<div style="text-align: center; margin-top: 30px;">
+<div id="results"></div>
+<div style="text-align: center; margin-top: 30px;">
   <a href="AP-000-Main.html" style="font-size: 16px; color: #007acc; text-decoration: none;">&larr; Back to Main</a>
-	</div>
+</div>
 </div>
 
 <footer>
-  Copyright 2025. BIONOTE INC. Antibody Platform Design Team, Jun Sei-Yong
+Copyright 2025. BIONOTE INC. Antibody Platform Design Team, Jun Sei-Yong
 </footer>
 
 <script>
-function validateBufferConditions() {
-  const pH = parseFloat(document.getElementById("pH").value);
-  const strength_mM = parseFloat(document.getElementById("strength").value);
-  const type = document.getElementById("bufferType").value;
-  let warnings = [];
-
-  // pH 범위 검증
-  if (type === "phosphate") {
-    if (pH < 6.2 || pH > 8.2) {
-      warnings.push("Warning: Phosphate buffer is most effective between pH 6.2-8.2");
-    }
-  } else if (type === "acetate") {
-    if (pH < 4.0 || pH > 6.0) {
-      warnings.push("Warning: Acetate buffer is most effective between pH 4.0-6.0");
-    }
-  } else if (type === "histidine") {
-    if (pH < 5.5 || pH > 7.0) {
-      warnings.push("Warning: Histidine buffer is most effective between pH 5.5-7.0");
-    }
-  }
-
-  // 버퍼 농도 검증
-  if (strength_mM < 10) {
-    warnings.push("Warning: Buffer concentration is very low (< 10 mM)");
-  }
-  if (strength_mM > 500) {
-    warnings.push("Warning: Buffer concentration is very high (> 500 mM)");
-  }
-
-  // 경고 표시
-  const warningContainer = document.getElementById("warningContainer");
-  if (warnings.length > 0) {
-    warningContainer.innerHTML = warnings.map(warning => 
-      `<div class="warning-alert">${warning}</div>`
-    ).join('');
-    warningContainer.style.display = 'block';
-  } else {
-    warningContainer.style.display = 'none';
-  }
-}
+const goodsBufferData = {
+  HEPES: { defaultStrength: 25, mw: 238.3, pHRange: "6.8–8.2" },
+  MES: { defaultStrength: 20, mw: 195.2, pHRange: "5.5–6.7" },
+  MOPS: { defaultStrength: 25, mw: 209.3, pHRange: "6.5–7.9" },
+  PIPES: { defaultStrength: 20, mw: 302.4, pHRange: "6.1–7.5" },
+  Tricine: { defaultStrength: 50, mw: 179.2, pHRange: "7.4–8.8" },
+  TAPS: { defaultStrength: 25, mw: 243.3, pHRange: "7.7–9.1" }
+};
 
 function updateBufferForm() {
   const type = document.getElementById("bufferType").value;
+  document.getElementById("goodsBufferRow").style.display = (type === "goods") ? "table-row" : "none";
+  document.getElementById("pHRow").style.display = (type !== "goods") ? "table-row" : "none";
+  document.getElementById("pHRangeRow").style.display = (type === "goods") ? "table-row" : "none";
   document.getElementById("NaClRow").style.display = (type === "phosphate") ? "table-row" : "none";
   document.getElementById("KClRow").style.display = (type === "phosphate") ? "table-row" : "none";
-  document.getElementById("pH").value = type === "phosphate" ? 7.4 : (type === "acetate" ? 5.2 : 5.5);
-  document.getElementById("strength").value = type === "phosphate" ? 100 : (type === "acetate" ? 50 : 20);
-  calculateBuffer();
+  if (type !== "goods") updateGoodsDefault();
+}
+
+function updateGoodsDefault() {
+  const buffer = document.getElementById("goodsBufferSelect").value;
+  if (goodsBufferData[buffer]) {
+    document.getElementById("pHRangeText").textContent = goodsBufferData[buffer].pHRange;
+    document.getElementById("strength").value = goodsBufferData[buffer].defaultStrength;
+  }
 }
 
 function calculateBuffer() {
-  validateBufferConditions();
-  
+  const type = document.getElementById("bufferType").value;
   const pH = parseFloat(document.getElementById("pH").value);
   const strength_mM = parseFloat(document.getElementById("strength").value);
-  const type = document.getElementById("bufferType").value;
   let html = `<table><tr><th colspan="4">Buffer Components</th></tr>`;
 
   if (type === "phosphate") {
     const NaCl_mM = parseFloat(document.getElementById("NaCl").value);
     const KCl_mM = parseFloat(document.getElementById("KCl").value);
-    const pKa1 = 2.15, pKa2 = 7.20, pKa3 = 12.38;
-    const A = 0.509, a = 5;
     const MW_NaH2PO4 = 156.01, MW_Na2HPO4 = 141, MW_NaCl = 58.44, MW_KCl = 74.55;
-    const strength = strength_mM / 1000;
-    const I = strength / 2;
-    const adjust_pKa = (pKa) => pKa + (A * Math.sqrt(I)) / (1 + a * Math.sqrt(I));
-    const adj_pKa1 = adjust_pKa(pKa1), adj_pKa2 = adjust_pKa(pKa2), adj_pKa3 = adjust_pKa(pKa3);
-    const Ka1 = 10**-adj_pKa1, Ka2 = 10**-adj_pKa2, Ka3 = 10**-adj_pKa3, H = 10**-pH;
-    const denom = H**3 + Ka1*H**2 + Ka1*Ka2*H + Ka1*Ka2*Ka3;
-    let H2PO4 = Ka1*H**2 / denom;
-    let HPO4 = Ka1*Ka2*H / denom;
-    let PO4 = Ka1*Ka2*Ka3 / denom;
-    const total = H2PO4 + HPO4 + PO4 + H**3 / denom;
-    H2PO4 *= strength / total;
-    HPO4 *= strength / total;
-    PO4 *= strength / total;
-    const NaH2PO4_mM = (strength - HPO4 - PO4) * 1000;
-    const Na2HPO4_mM = (HPO4 + PO4) * 1000;
-    const NaH2PO4_gL = NaH2PO4_mM / 1000 * MW_NaH2PO4;
-    const Na2HPO4_gL = Na2HPO4_mM / 1000 * MW_Na2HPO4;
+    const pKa2 = 7.20;
+    const ratio = Math.pow(10, pH - pKa2);
+    const base_mM = (ratio / (1 + ratio)) * strength_mM;
+    const acid_mM = strength_mM - base_mM;
+    const acid_gL = acid_mM / 1000 * MW_NaH2PO4;
+    const base_gL = base_mM / 1000 * MW_Na2HPO4;
     const NaCl_gL = NaCl_mM / 1000 * MW_NaCl;
     const KCl_gL = KCl_mM / 1000 * MW_KCl;
-    html += `<tr><td>Monosodium phosphate</td><td>${NaH2PO4_mM.toFixed(2)} mM</td><td>${NaH2PO4_gL.toFixed(2)} g/L</td><td>–</td></tr>`;
-    html += `<tr><td>Disodium phosphate</td><td>${Na2HPO4_mM.toFixed(2)} mM</td><td>${Na2HPO4_gL.toFixed(2)} g/L</td><td>–</td></tr>`;
+    html += `<tr><td>Monosodium phosphate</td><td>${acid_mM.toFixed(2)} mM</td><td>${acid_gL.toFixed(2)} g/L</td><td>–</td></tr>`;
+    html += `<tr><td>Disodium phosphate</td><td>${base_mM.toFixed(2)} mM</td><td>${base_gL.toFixed(2)} g/L</td><td>–</td></tr>`;
     html += `<tr><td>NaCl</td><td>${NaCl_mM.toFixed(2)} mM</td><td>${NaCl_gL.toFixed(2)} g/L</td><td>–</td></tr>`;
     html += `<tr><td>KCl</td><td>${KCl_mM.toFixed(2)} mM</td><td>${KCl_gL.toFixed(2)} g/L</td><td>–</td></tr>`;
   } else if (type === "acetate") {
@@ -246,14 +156,18 @@ function calculateBuffer() {
     const acetic_mL = acetic_mM / 1000 / AcOH_stock_M * 1000;
     html += `<tr><td>L-Histidine</td><td>${his_mM.toFixed(2)} mM</td><td>${his_gL.toFixed(3)} g/L</td><td>–</td></tr>`;
     html += `<tr><td>Acetic acid</td><td>${acetic_mM.toFixed(2)} mM</td><td>${acetic_gL.toFixed(3)} g/L</td><td>${acetic_mL.toFixed(2)} mL/L</td></tr>`;
+  } else if (type === "goods") {
+    const buffer = document.getElementById("goodsBufferSelect").value;
+    const mw = goodsBufferData[buffer].mw;
+    const gL = (strength_mM / 1000) * mw;
+    html += `<tr><td>${buffer}</td><td>${strength_mM.toFixed(1)} mM</td><td>${gL.toFixed(3)} g/L</td><td>–</td></tr>`;
   }
+
   html += `</table>`;
   document.getElementById("results").innerHTML = html;
 }
 
-window.onload = () => {
-  updateBufferForm();
-};
+window.onload = () => updateBufferForm();
 </script>
 </body>
 </html>
