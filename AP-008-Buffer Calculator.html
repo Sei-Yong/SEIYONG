@@ -215,13 +215,13 @@ function calculateBuffer() {
     html += `<tr><td>${buffer} (${mw}g/mol)</td><td>${strength_mM.toFixed(1)} mM</td><td>${gL.toFixed(3)} g/L</td><td>–</td></tr>`;
   } else if (type === "citrate") {
     const pKa = 4.76;
-    const MW_acid = 294.10, MW_base = 294.10;
+    const MW_acid = 228.15, MW_base = 294.10;
     const ratio = Math.pow(10, pH - pKa);
     const base_mM = (ratio / (1 + ratio)) * strength_mM;
     const acid_mM = strength_mM - base_mM;
     const base_gL = base_mM / 1000 * MW_base;
     const acid_gL = acid_mM / 1000 * MW_acid;
-    html += `<tr><td>Citric acid dihydrate (294.10g/mol)</td><td>${acid_mM.toFixed(2)} mM</td><td>${acid_gL.toFixed(3)} g/L</td><td>–</td></tr>`;
+    html += `<tr><td>Citric acid dihydrate (228.15g/mol)</td><td>${acid_mM.toFixed(2)} mM</td><td>${acid_gL.toFixed(3)} g/L</td><td>–</td></tr>`;
     html += `<tr><td>Trisodium citrate dihydrate (294.10g/mol)</td><td>${base_mM.toFixed(2)} mM</td><td>${base_gL.toFixed(3)} g/L</td><td>–</td></tr>`;
   }
 
