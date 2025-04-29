@@ -44,150 +44,141 @@
     <div>Copyright 2025. BIONOTE INC. Antibody Platform Design Team, Jun Sei-Yong</div>
   </footer>
   <!-- 스크립트는 페이지 하단에 배치 -->
-  <script>
-    // 코돈 표 (기본값: TAG는 멈춤 부호)
-    const codonTable = {
-      'TTT': 'F', 'TTC': 'F', 'TTA': 'L', 'TTG': 'L', 'CTT': 'L', 'CTC': 'L',
-      'CTA': 'L', 'CTG': 'L', 'ATT': 'I', 'ATC': 'I', 'ATA': 'I', 'ATG': 'M',
-      'GTT': 'V', 'GTC': 'V', 'GTA': 'V', 'GTG': 'V', 'TCT': 'S', 'TCC': 'S',
-      'TCA': 'S', 'TCG': 'S', 'CCT': 'P', 'CCC': 'P', 'CCA': 'P', 'CCG': 'P',
-      'ACT': 'T', 'ACC': 'T', 'ACA': 'T', 'ACG': 'T', 'GCT': 'A', 'GCC': 'A',
-      'GCA': 'A', 'GCG': 'A', 'TAT': 'Y', 'TAC': 'Y', 'TAA': '*', 'TAG': '*',
-      'CAT': 'H', 'CAC': 'H', 'CAA': 'Q', 'CAG': 'Q', 'AAT': 'N', 'AAC': 'N',
-      'AAA': 'K', 'AAG': 'K', 'GAT': 'D', 'GAC': 'D', 'GAA': 'E', 'GAG': 'E',
-      'TGT': 'C', 'TGC': 'C', 'TGA': '*', 'TGG': 'W', 'CGT': 'R', 'CGC': 'R',
-      'CGA': 'R', 'CGG': 'R', 'AGT': 'S', 'AGC': 'S', 'AGA': 'R', 'AGG': 'R',
-      'GGT': 'G', 'GGC': 'G', 'GGA': 'G', 'GGG': 'G'
-    };
+<script>
+  const codonTable = {
+    'TTT': 'F', 'TTC': 'F', 'TTA': 'L', 'TTG': 'L', 'CTT': 'L', 'CTC': 'L',
+    'CTA': 'L', 'CTG': 'L', 'ATT': 'I', 'ATC': 'I', 'ATA': 'I', 'ATG': 'M',
+    'GTT': 'V', 'GTC': 'V', 'GTA': 'V', 'GTG': 'V', 'TCT': 'S', 'TCC': 'S',
+    'TCA': 'S', 'TCG': 'S', 'CCT': 'P', 'CCC': 'P', 'CCA': 'P', 'CCG': 'P',
+    'ACT': 'T', 'ACC': 'T', 'ACA': 'T', 'ACG': 'T', 'GCT': 'A', 'GCC': 'A',
+    'GCA': 'A', 'GCG': 'A', 'TAT': 'Y', 'TAC': 'Y', 'TAA': '*', 'TAG': '*',
+    'CAT': 'H', 'CAC': 'H', 'CAA': 'Q', 'CAG': 'Q', 'AAT': 'N', 'AAC': 'N',
+    'AAA': 'K', 'AAG': 'K', 'GAT': 'D', 'GAC': 'D', 'GAA': 'E', 'GAG': 'E',
+    'TGT': 'C', 'TGC': 'C', 'TGA': '*', 'TGG': 'W', 'CGT': 'R', 'CGC': 'R',
+    'CGA': 'R', 'CGG': 'R', 'AGT': 'S', 'AGC': 'S', 'AGA': 'R', 'AGG': 'R',
+    'GGT': 'G', 'GGC': 'G', 'GGA': 'G', 'GGG': 'G'
+  };
 
-    // 역상보열 생성 함수
-    function reverseComplement(seq) {
-      return seq.split('').reverse().map(base => {
-        return {A: 'T', T: 'A', G: 'C', C: 'G'}[base] || 'N';
-      }).join('');
+  function reverseComplement(seq) {
+    return seq.split('').reverse().map(base => {
+      return {A: 'T', T: 'A', G: 'C', C: 'G'}[base] || 'N';
+    }).join('');
+  }
+
+  function chunk(str, size) {
+    const chunks = [];
+    for (let i = 0; i < str.length; i += size) {
+      chunks.push(str.slice(i, i + size));
+    }
+    return chunks;
+  }
+
+  function formatCentered(seq, aaArr) {
+    let ntLine = seq;
+    let aaLine = Array(seq.length).fill(' ');
+    for (let i = 0; i < aaArr.length; i++) {
+      const pos = i * 3 + 1;
+      if (pos < seq.length) aaLine[pos] = aaArr[i];
+    }
+    const ntChunks = chunk(ntLine, 114);
+    const aaChunks = chunk(aaLine.join(''), 114);
+    let out = '';
+    for (let i = 0; i < ntChunks.length; i++) {
+      out += ntChunks[i] + '\n' + (aaChunks[i] || '') + '\n\n';
+    }
+    return out;
+  }
+
+  function formatCompact(aaArr) {
+    return chunk(aaArr.join(''), 114).join('\n');
+  }
+
+  function handleOption(selected) {
+    document.getElementById("compact").checked = false;
+    document.getElementById("includeSeq").checked = false;
+    selected.checked = true;
+  }
+
+  function runTranslation() {
+    const seq = document.getElementById("ntInput").value.toUpperCase().replace(/[^ATGC]/g, '');
+    const compact = document.getElementById("compact").checked;
+    const includeSeq = document.getElementById("includeSeq").checked;
+    const amberSuppressor = document.getElementById("amberSuppressor").checked;
+    let output = '';
+    const rc = reverseComplement(seq);
+
+    const codonTableCopy = { ...codonTable };
+    if (amberSuppressor) {
+      codonTableCopy['TAG'] = 'Q';
+    } else {
+      codonTableCopy['TAG'] = '*';
     }
 
-    // 문자열을 일정 길이로 나누기
-    function chunk(str, size) {
-      const chunks = [];
-      for (let i = 0; i < str.length; i += size) {
-        chunks.push(str.slice(i, i + size));
-      }
-      return chunks;
-    }
-
-    // 중앙 정렬 형식: nt 서열 아래 중앙에 아미노산 배치
-    function formatCentered(seq, aaArr) {
-      let ntLine = seq;
-      let aaLine = Array(seq.length).fill(' ');
-      for (let i = 0; i < aaArr.length; i++) {
-        const pos = i * 3 + 1;
-        if (pos < seq.length) aaLine[pos] = aaArr[i];
-      }
-      const ntChunks = chunk(ntLine, 114);
-      const aaChunks = chunk(aaLine.join(''), 114);
-      let out = '';
-      for (let i = 0; i < ntChunks.length; i++) {
-        out += ntChunks[i] + '\n' + (aaChunks[i] || '') + '\n\n';
-      }
-      return out;
-    }
-
-    // 압축 형식: 아미노산 배열을 한 줄로 표시
-    function formatCompact(aaArr) {
-      return chunk(aaArr.join(''), 114).join('\n');
-    }
-
-    // 옵션 중 하나만 선택되도록 처리
-    function handleOption(selected) {
-      document.getElementById("compact").checked = false;
-      document.getElementById("includeSeq").checked = false;
-      selected.checked = true;
-    }
-
-    // 번역 함수: Amber suppressor 옵션에 따라 TAG 코돈 처리
-    function runTranslation() {
-      const seq = document.getElementById("ntInput").value.toUpperCase().replace(/[^ATGC]/g, '');
-      const compact = document.getElementById("compact").checked;
-      const includeSeq = document.getElementById("includeSeq").checked;
-      const amberSuppressor = document.getElementById("amberSuppressor").checked;
-      let output = '';
-      const rc = reverseComplement(seq);
-
-      // codonTable 복사본 생성 후 Amber suppressor 적용
-      const codonTableCopy = { ...codonTable };
-      if (amberSuppressor) {
-        codonTableCopy['TAG'] = 'Q';
-      } else {
-        codonTableCopy['TAG'] = '*';
-      }
-
-      // codonTableCopy를 이용해 아미노산 번역
-      function translateFrame(seq, frame) {
-        const aa = [];
-        for (let i = frame; i < seq.length - 2; i += 3) {
-          const codon = seq.substring(i, i + 3);
+    // 번역 함수 수정: TAG→Q인 경우 특별 마크업 {TAGQ}
+    function translateFrame(seq, frame) {
+      const aa = [];
+      for (let i = frame; i < seq.length - 2; i += 3) {
+        const codon = seq.substring(i, i + 3);
+        if (amberSuppressor && codon === 'TAG') {
+          aa.push('{TAGQ}');
+        } else {
           aa.push(codonTableCopy[codon] || '-');
         }
-        return aa;
       }
-
-      // 출력 형식을 위한 프레임 블록 생성
-      function frameBlock(title, nt, aaArr) {
-        let content = '';
-        if (includeSeq && !compact) {
-          content = formatCentered(nt, aaArr);
-        } else {
-          content = compact ? formatCompact(aaArr) : aaArr.join(' ');
-        }
-        return `
-          <div class="frame-block">
-            <div class="frame-title">${title}</div>
-            <div class="frame-content">${content}</div>
-          </div>
-        `;
-      }
-
-      // 정방향 프레임 (Frame +1, +2, +3)
-      for (let i = 0; i < 3; i++) {
-        const aaArr = translateFrame(seq, i);
-        const nt = seq.slice(i);
-        output += frameBlock(`→ Frame +${i + 1}`, nt, aaArr);
-      }
-
-      // 역상보열 프레임 (Frame -1, -2, -3)
-      for (let i = 0; i < 3; i++) {
-        const aaArr = translateFrame(rc, i);
-        const nt = rc.slice(i);
-        output += frameBlock(`← Frame -${i + 1} (rev)`, nt, aaArr);
-      }
-
-      document.getElementById("output").innerHTML = output;
+      return aa;
     }
 
-    // 번역 후 아미노산 하이라이팅 적용 (예: M은 노란색, *는 빨간색)
-    const observer = new MutationObserver(() => {
-      highlightSpecialAminoAcids();
+    function frameBlock(title, nt, aaArr) {
+      let content = '';
+      if (includeSeq && !compact) {
+        content = formatCentered(nt, aaArr);
+      } else {
+        content = compact ? formatCompact(aaArr) : aaArr.join(' ');
+      }
+      return `
+        <div class="frame-block">
+          <div class="frame-title">${title}</div>
+          <div class="frame-content">${content}</div>
+        </div>
+      `;
+    }
+
+    for (let i = 0; i < 3; i++) {
+      const aaArr = translateFrame(seq, i);
+      const nt = seq.slice(i);
+      output += frameBlock(`→ Frame +${i + 1}`, nt, aaArr);
+    }
+    for (let i = 0; i < 3; i++) {
+      const aaArr = translateFrame(rc, i);
+      const nt = rc.slice(i);
+      output += frameBlock(`← Frame -${i + 1} (rev)`, nt, aaArr);
+    }
+
+    document.getElementById("output").innerHTML = output;
+  }
+
+  // MutationObserver 그대로 사용
+  const observer = new MutationObserver(() => {
+    highlightSpecialAminoAcids();
+  });
+  observer.observe(document.getElementById("output"), { childList: true });
+
+  // highlightSpecialAminoAcids 수정: {TAGQ}만 빨간 Q로 변환
+  function highlightSpecialAminoAcids() {
+    const outputDiv = document.getElementById("output");
+    outputDiv.querySelectorAll('.frame-content').forEach(div => {
+      let raw = div.innerHTML;
+
+      // {TAGQ} → 빨간색 Bold Q로
+      raw = raw.replace(/\{TAGQ\}/g, `<span style="color: red; font-weight: bold;">Q</span>`);
+
+      // 나머지 M, * 처리
+      raw = raw.replace(/M/g, `<span style="background: yellow; font-weight: bold;">M</span>`);
+      raw = raw.replace(/\*/g, `<span style="color: red; font-weight: bold;">*</span>`);
+
+      div.innerHTML = raw;
     });
-    observer.observe(document.getElementById("output"), { childList: true });
-
-    function highlightSpecialAminoAcids() {
-      const outputDiv = document.getElementById("output");
-      outputDiv.querySelectorAll('.frame-content').forEach(div => {
-        const raw = div.innerText;
-        let html = '';
-        for (let ch of raw) {
-          if (ch === 'M') {
-            html += `<span style="background: yellow; font-weight: bold;">M</span>`;
-          } else if (ch === '*') {
-            html += `<span style="color: red; font-weight: bold;">*</span>`;
-          } else {
-            html += ch;
-          }
-        }
-        div.innerHTML = html;
-      });
-    }
-  </script>
+  }
+</script>
 </body>
 </html>
