@@ -214,7 +214,7 @@ function calculateBuffer() {
     const gL = (strength_mM / 1000) * mw;
     html += `<tr><td>${buffer} (${mw}g/mol)</td><td>${strength_mM.toFixed(1)} mM</td><td>${gL.toFixed(3)} g/L</td><td>–</td></tr>`;
   } else if (type === "citrate") {
-    const pKa = 6.4;
+    const pKa = 4.76;
     const MW_acid = 192.12, MW_base = 294.10;
     const ratio = Math.pow(10, pH - pKa);
     const base_mM = (ratio / (1 + ratio)) * strength_mM;
