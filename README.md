@@ -1,4 +1,4 @@
-## SEI-YONG TEAM TOOLS
+## SEI-YONG TOOLS
 
 This website and its contents are the property of **Sei-Yong Jun** 
 Unauthorized copying or reproduction may result in **legal consequences**.
