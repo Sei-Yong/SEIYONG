@@ -37,14 +37,29 @@
       padding: 4px;
       text-align: center;
     }
-    tr[style*="background:yellow"] {
+    /* 하이라이트 행을 위한 스타일 */
+    .highlight {
       background: yellow !important;
     }
     footer {
       text-align: center;
-      margin-top: 50px; /* 푸터와 링크 사이의 간격을 위해 조정 */
+      margin-top: 20px;
       color: #666;
       font-size: 14px;
+    }
+    .back-nav {
+      text-align: center;
+      margin-top: 40px;
+      margin-bottom: 20px;
+    }
+    .back-nav a {
+      font-size: 16px;
+      color: #007acc;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .back-nav a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -53,19 +68,221 @@
   
   <div class="tables">
     <div class="codon-box">
-        <h3 style="text-align:center; font-style: italic;">E. coli</h3>
-        <table>...</table>
+      <h3 style="text-align:center; font-style: italic;">E. coli</h3>
+      <table>
+        <tr style="background:#f2f2f2;"><th>Triplet</th><th>AA</th><th>Fraction</th></tr>
+        <tr class="highlight"><td>TTT</td><td>F</td><td>0.58</td></tr>
+        <tr><td>TTC</td><td>F</td><td>0.42</td></tr>
+        <tr><td>TTA</td><td>L</td><td>0.14</td></tr>
+        <tr><td>TTG</td><td>L</td><td>0.13</td></tr>
+        <tr class="highlight"><td>TAT</td><td>Y</td><td>0.59</td></tr>
+        <tr><td>TAC</td><td>Y</td><td>0.41</td></tr>
+        <tr><td>TAA</td><td>*</td><td>0.61</td></tr>
+        <tr><td>TAG</td><td>*</td><td>0.09</td></tr>
+        <tr><td>CTT</td><td>L</td><td>0.12</td></tr>
+        <tr><td>CTC</td><td>L</td><td>0.10</td></tr>
+        <tr><td>CTA</td><td>L</td><td>0.04</td></tr>
+        <tr class="highlight"><td>CTG</td><td>L</td><td>0.47</td></tr>
+        <tr class="highlight"><td>CAT</td><td>H</td><td>0.57</td></tr>
+        <tr><td>CAC</td><td>H</td><td>0.43</td></tr>
+        <tr><td>CAA</td><td>Q</td><td>0.34</td></tr>
+        <tr class="highlight"><td>CAG</td><td>Q</td><td>0.66</td></tr>
+        <tr class="highlight"><td>ATT</td><td>I</td><td>0.49</td></tr>
+        <tr><td>ATC</td><td>I</td><td>0.39</td></tr>
+        <tr><td>ATA</td><td>I</td><td>0.11</td></tr>
+        <tr class="highlight"><td>ATG</td><td>M</td><td>1.00</td></tr>
+        <tr><td>AAT</td><td>N</td><td>0.49</td></tr>
+        <tr class="highlight"><td>AAC</td><td>N</td><td>0.51</td></tr>
+        <tr class="highlight"><td>AAA</td><td>K</td><td>0.74</td></tr>
+        <tr><td>AAG</td><td>K</td><td>0.26</td></tr>
+        <tr><td>GTT</td><td>V</td><td>0.28</td></tr>
+        <tr><td>GTC</td><td>V</td><td>0.20</td></tr>
+        <tr><td>GTA</td><td>V</td><td>0.17</td></tr>
+        <tr class="highlight"><td>GTG</td><td>V</td><td>0.35</td></tr>
+        <tr class="highlight"><td>GAT</td><td>D</td><td>0.63</td></tr>
+        <tr><td>GAC</td><td>D</td><td>0.37</td></tr>
+        <tr class="highlight"><td>GAA</td><td>E</td><td>0.68</td></tr>
+        <tr><td>GAG</td><td>E</td><td>0.32</td></tr>
+        <tr><td>TCT</td><td>S</td><td>0.17</td></tr>
+        <tr><td>TCC</td><td>S</td><td>0.15</td></tr>
+        <tr><td>TCA</td><td>S</td><td>0.14</td></tr>
+        <tr><td>TCG</td><td>S</td><td>0.14</td></tr>
+        <tr><td>TGT</td><td>C</td><td>0.46</td></tr>
+        <tr class="highlight"><td>TGC</td><td>C</td><td>0.54</td></tr>
+        <tr><td>TGA</td><td>*</td><td>0.30</td></tr>
+        <tr class="highlight"><td>TGG</td><td>W</td><td>1.00</td></tr>
+        <tr><td>CCT</td><td>P</td><td>0.18</td></tr>
+        <tr><td>CCC</td><td>P</td><td>0.13</td></tr>
+        <tr><td>CCA</td><td>P</td><td>0.20</td></tr>
+        <tr class="highlight"><td>CCG</td><td>P</td><td>0.49</td></tr>
+        <tr class="highlight"><td>CGT</td><td>R</td><td>0.36</td></tr>
+        <tr class="highlight"><td>CGC</td><td>R</td><td>0.36</td></tr>
+        <tr><td>CGA</td><td>R</td><td>0.07</td></tr>
+        <tr><td>CGG</td><td>R</td><td>0.11</td></tr>
+        <tr><td>ACT</td><td>T</td><td>0.19</td></tr>
+        <tr><td>ACC</td><td>T</td><td>0.40</td></tr>
+        <tr><td>ACA</td><td>T</td><td>0.17</td></tr>
+        <tr class="highlight"><td>ACG</td><td>T</td><td>0.25</td></tr>
+        <tr><td>AGT</td><td>S</td><td>0.16</td></tr>
+        <tr class="highlight"><td>AGC</td><td>S</td><td>0.25</td></tr>
+        <tr><td>AGA</td><td>R</td><td>0.07</td></tr>
+        <tr><td>AGG</td><td>R</td><td>0.04</td></tr>
+        <tr><td>GCT</td><td>A</td><td>0.18</td></tr>
+        <tr><td>GCC</td><td>A</td><td>0.26</td></tr>
+        <tr><td>GCA</td><td>A</td><td>0.23</td></tr>
+        <tr class="highlight"><td>GCG</td><td>A</td><td>0.33</td></tr>
+        <tr><td>GGT</td><td>G</td><td>0.35</td></tr>
+        <tr class="highlight"><td>GGC</td><td>G</td><td>0.37</td></tr>
+        <tr><td>GGA</td><td>G</td><td>0.13</td></tr>
+        <tr><td>GGG</td><td>G</td><td>0.15</td></tr>
+      </table>
     </div>
+
     <div class="codon-box">
-        <h3 style="text-align:center; font-style: italic;">S. cerevisiae</h3>
-        <table>...</table>
+      <h3 style="text-align:center; font-style: italic;">S. cerevisiae</h3>
+      <table>
+        <tr style="background:#f2f2f2;"><th>Triplet</th><th>AA</th><th>Fraction</th></tr>
+        <tr class="highlight"><td>TTT</td><td>F</td><td>0.59</td></tr>
+        <tr><td>TTC</td><td>F</td><td>0.41</td></tr>
+        <tr><td>TTA</td><td>L</td><td>0.28</td></tr>
+        <tr class="highlight"><td>TTG</td><td>L</td><td>0.29</td></tr>
+        <tr class="highlight"><td>TAT</td><td>Y</td><td>0.56</td></tr>
+        <tr><td>TAC</td><td>Y</td><td>0.44</td></tr>
+        <tr><td>TAA</td><td>*</td><td>0.48</td></tr>
+        <tr><td>TAG</td><td>*</td><td>0.24</td></tr>
+        <tr><td>CTT</td><td>L</td><td>0.13</td></tr>
+        <tr><td>CTC</td><td>L</td><td>0.06</td></tr>
+        <tr><td>CTA</td><td>L</td><td>0.14</td></tr>
+        <tr><td>CTG</td><td>L</td><td>0.11</td></tr>
+        <tr class="highlight"><td>CAT</td><td>H</td><td>0.64</td></tr>
+        <tr><td>CAC</td><td>H</td><td>0.36</td></tr>
+        <tr class="highlight"><td>CAA</td><td>Q</td><td>0.69</td></tr>
+        <tr><td>CAG</td><td>Q</td><td>0.31</td></tr>
+        <tr class="highlight"><td>ATT</td><td>I</td><td>0.46</td></tr>
+        <tr><td>ATC</td><td>I</td><td>0.26</td></tr>
+        <tr><td>ATA</td><td>I</td><td>0.27</td></tr>
+        <tr class="highlight"><td>ATG</td><td>M</td><td>1.00</td></tr>
+        <tr class="highlight"><td>AAT</td><td>N</td><td>0.59</td></tr>
+        <tr><td>AAC</td><td>N</td><td>0.41</td></tr>
+        <tr class="highlight"><td>AAA</td><td>K</td><td>0.58</td></tr>
+        <tr><td>AAG</td><td>K</td><td>0.42</td></tr>
+        <tr class="highlight"><td>GTT</td><td>V</td><td>0.39</td></tr>
+        <tr><td>GTC</td><td>V</td><td>0.21</td></tr>
+        <tr><td>GTA</td><td>V</td><td>0.21</td></tr>
+        <tr><td>GTG</td><td>V</td><td>0.19</td></tr>
+        <tr class="highlight"><td>GAT</td><td>D</td><td>0.65</td></tr>
+        <tr><td>GAC</td><td>D</td><td>0.35</td></tr>
+        <tr class="highlight"><td>GAA</td><td>E</td><td>0.71</td></tr>
+        <tr><td>GAG</td><td>E</td><td>0.29</td></tr>
+        <tr class="highlight"><td>TCT</td><td>S</td><td>0.26</td></tr>
+        <tr><td>TCC</td><td>S</td><td>0.16</td></tr>
+        <tr><td>TCA</td><td>S</td><td>0.21</td></tr>
+        <tr><td>TCG</td><td>S</td><td>0.10</td></tr>
+        <tr class="highlight"><td>TGT</td><td>C</td><td>0.63</td></tr>
+        <tr><td>TGC</td><td>C</td><td>0.37</td></tr>
+        <tr><td>TGA</td><td>*</td><td>0.29</td></tr>
+        <tr class="highlight"><td>TGG</td><td>W</td><td>1.00</td></tr>
+        <tr><td>CCT</td><td>P</td><td>0.31</td></tr>
+        <tr><td>CCC</td><td>P</td><td>0.15</td></tr>
+        <tr class="highlight"><td>CCA</td><td>P</td><td>0.41</td></tr>
+        <tr><td>CCG</td><td>P</td><td>0.12</td></tr>
+        <tr><td>CGT</td><td>R</td><td>0.15</td></tr>
+        <tr><td>CGC</td><td>R</td><td>0.06</td></tr>
+        <tr><td>CGA</td><td>R</td><td>0.07</td></tr>
+        <tr><td>CGG</td><td>R</td><td>0.04</td></tr>
+        <tr class="highlight"><td>ACT</td><td>T</td><td>0.35</td></tr>
+        <tr><td>ACC</td><td>T</td><td>0.22</td></tr>
+        <tr><td>ACA</td><td>T</td><td>0.30</td></tr>
+        <tr><td>ACG</td><td>T</td><td>0.13</td></tr>
+        <tr><td>AGT</td><td>S</td><td>0.16</td></tr>
+        <tr><td>AGC</td><td>S</td><td>0.11</td></tr>
+        <tr class="highlight"><td>AGA</td><td>R</td><td>0.48</td></tr>
+        <tr><td>AGG</td><td>R</td><td>0.21</td></tr>
+        <tr class="highlight"><td>GCT</td><td>A</td><td>0.38</td></tr>
+        <tr><td>GCC</td><td>A</td><td>0.22</td></tr>
+        <tr><td>GCA</td><td>A</td><td>0.29</td></tr>
+        <tr><td>GCG</td><td>A</td><td>0.11</td></tr>
+        <tr class="highlight"><td>GGT</td><td>G</td><td>0.47</td></tr>
+        <tr><td>GGC</td><td>G</td><td>0.19</td></tr>
+        <tr><td>GGA</td><td>G</td><td>0.22</td></tr>
+        <tr><td>GGG</td><td>G</td><td>0.12</td></tr>
+      </table>
     </div>
+
     <div class="codon-box">
-        <h3 style="text-align:center; font-style: italic;">Homo sapiens</h3>
-        <table>...</table>
+      <h3 style="text-align:center; font-style: italic;">Homo sapiens</h3>
+      <table>
+        <tr style="background:#f2f2f2;"><th>Triplet</th><th>AA</th><th>Fraction</th></tr>
+        <tr><td>TTT</td><td>F</td><td>0.45</td></tr>
+        <tr class="highlight"><td>TTC</td><td>F</td><td>0.55</td></tr>
+        <tr><td>TTA</td><td>L</td><td>0.07</td></tr>
+        <tr><td>TTG</td><td>L</td><td>0.13</td></tr>
+        <tr><td>TAT</td><td>Y</td><td>0.43</td></tr>
+        <tr class="highlight"><td>TAC</td><td>Y</td><td>0.57</td></tr>
+        <tr><td>TAA</td><td>*</td><td>0.28</td></tr>
+        <tr><td>TAG</td><td>*</td><td>0.20</td></tr>
+        <tr><td>CTT</td><td>L</td><td>0.13</td></tr>
+        <tr><td>CTC</td><td>L</td><td>0.20</td></tr>
+        <tr><td>CTA</td><td>L</td><td>0.07</td></tr>
+        <tr class="highlight"><td>CTG</td><td>L</td><td>0.41</td></tr>
+        <tr><td>CAT</td><td>H</td><td>0.41</td></tr>
+        <tr class="highlight"><td>CAC</td><td>H</td><td>0.59</td></tr>
+        <tr><td>CAA</td><td>Q</td><td>0.25</td></tr>
+        <tr class="highlight"><td>CAG</td><td>Q</td><td>0.75</td></tr>
+        <tr><td>ATT</td><td>I</td><td>0.36</td></tr>
+        <tr class="highlight"><td>ATC</td><td>I</td><td>0.48</td></tr>
+        <tr><td>ATA</td><td>I</td><td>0.16</td></tr>
+        <tr class="highlight"><td>ATG</td><td>M</td><td>1.00</td></tr>
+        <tr><td>AAT</td><td>N</td><td>0.46</td></tr>
+        <tr class="highlight"><td>AAC</td><td>N</td><td>0.54</td></tr>
+        <tr><td>AAA</td><td>K</td><td>0.42</td></tr>
+        <tr class="highlight"><td>AAG</td><td>K</td><td>0.58</td></tr>
+        <tr><td>GTT</td><td>V</td><td>0.18</td></tr>
+        <tr><td>GTC</td><td>V</td><td>0.24</td></tr>
+        <tr><td>GTA</td><td>V</td><td>0.11</td></tr>
+        <tr class="highlight"><td>GTG</td><td>V</td><td>0.47</td></tr>
+        <tr><td>GAT</td><td>D</td><td>0.46</td></tr>
+        <tr class="highlight"><td>GAC</td><td>D</td><td>0.54</td></tr>
+        <tr><td>GAA</td><td>E</td><td>0.42</td></tr>
+        <tr class="highlight"><td>GAG</td><td>E</td><td>0.58</td></tr>
+        <tr><td>TCT</td><td>S</td><td>0.18</td></tr>
+        <tr><td>TCC</td><td>S</td><td>0.22</td></tr>
+        <tr><td>TCA</td><td>S</td><td>0.15</td></tr>
+        <tr><td>TCG</td><td>S</td><td>0.06</td></tr>
+        <tr><td>TGT</td><td>C</td><td>0.45</td></tr>
+        <tr class="highlight"><td>TGC</td><td>C</td><td>0.55</td></tr>
+        <tr><td>TGA</td><td>*</td><td>0.52</td></tr>
+        <tr class="highlight"><td>TGG</td><td>W</td><td>1.00</td></tr>
+        <tr><td>CCT</td><td>P</td><td>0.28</td></tr>
+        <tr class="highlight"><td>CCC</td><td>P</td><td>0.33</td></tr>
+        <tr><td>CCA</td><td>P</td><td>0.27</td></tr>
+        <tr><td>CCG</td><td>P</td><td>0.11</td></tr>
+        <tr><td>CGT</td><td>R</td><td>0.08</td></tr>
+        <tr><td>CGC</td><td>R</td><td>0.19</td></tr>
+        <tr><td>CGA</td><td>R</td><td>0.11</td></tr>
+        <tr class="highlight"><td>CGG</td><td>R</td><td>0.21</td></tr>
+        <tr><td>ACT</td><td>T</td><td>0.24</td></tr>
+        <tr class="highlight"><td>ACC</td><td>T</td><td>0.36</td></tr>
+        <tr><td>ACA</td><td>T</td><td>0.28</td></tr>
+        <tr><td>ACG</td><td>T</td><td>0.12</td></tr>
+        <tr><td>AGT</td><td>S</td><td>0.15</td></tr>
+        <tr class="highlight"><td>AGC</td><td>S</td><td>0.24</td></tr>
+        <tr><td>AGA</td><td>R</td><td>0.20</td></tr>
+        <tr><td>AGG</td><td>R</td><td>0.20</td></tr>
+        <tr><td>GCT</td><td>A</td><td>0.26</td></tr>
+        <tr class="highlight"><td>GCC</td><td>A</td><td>0.40</td></tr>
+        <tr><td>GCA</td><td>A</td><td>0.23</td></tr>
+        <tr><td>GCG</td><td>A</td><td>0.11</td></tr>
+        <tr><td>GGT</td><td>G</td><td>0.16</td></tr>
+        <tr class="highlight"><td>GGC</td><td>G</td><td>0.34</td></tr>
+        <tr><td>GGA</td><td>G</td><td>0.25</td></tr>
+        <tr><td>GGG</td><td>G</td><td>0.25</td></tr>
+      </table>
     </div>
-  </div> <div style="text-align: center; margin-top: 40px; margin-bottom: 20px;">
-    <a href="AP-000-Main.html" style="font-size: 16px; color: #007acc; text-decoration: none; font-weight: bold;">&larr; Back to Main</a>
+  </div>
+
+  <div class="back-nav">
+    <a href="AP-000-Main.html">&larr; Back to Main</a>
   </div>
 
   <footer>
