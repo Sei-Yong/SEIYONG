@@ -9,24 +9,25 @@
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   .card { border: 1px solid #dee2e6; padding: 20px; border-radius: 10px; background: #fff; margin-bottom: 20px; }
   .full-card { grid-column: 1 / span 2; }
-  h3 { color: #0056b3; margin-top: 0; border-bottom: 2px solid #e9ecef; padding-bottom: 10px; margin-bottom: 15px; }
+  h3 { color: #0056b3; margin-top: 0; border-bottom: 2px solid #e9ecef; padding-bottom: 10px; margin-bottom: 15px; font-size: 16px; }
   .input-group { margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
-  label { font-weight: bold; font-size: 13px; flex: 1; }
+  label { font-weight: bold; font-size: 13px; flex: 1.2; color: #444; }
   .input-wrapper { flex: 1; display: flex; align-items: center; gap: 5px; }
-  input { width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 5px; box-sizing: border-box; text-align: right; }
-  input:disabled { background: #f8f9fa; color: #495057; font-weight: bold; }
-  .unit { font-size: 12px; color: #666; width: 50px; }
-  .highlight-row { background: #fff9db !important; font-weight: bold; }
+  input { width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 5px; box-sizing: border-box; text-align: right; font-size: 13px; }
+  input:focus { border-color: #007bff; outline: none; background: #f1f8ff; }
+  input:disabled { background: #f8f9fa; color: #666; font-weight: bold; border-style: dashed; }
+  .unit { font-size: 11px; color: #888; width: 55px; }
   table { width: 100%; border-collapse: collapse; margin-top: 10px; }
   th, td { border: 1px solid #dee2e6; padding: 10px; text-align: center; font-size: 13px; }
-  th { background: #f1f3f5; }
-  .info-text { font-size: 12px; color: #6c757d; margin-top: 5px; }
+  th { background: #f1f3f5; color: #555; }
+  .res-val { font-weight: bold; color: #d9480f; background: #fff9db; }
+  .info-tag { font-size: 11px; color: #007bff; margin-left: 5px; font-weight: normal; }
 </style>
 </head>
 <body>
 
 <div class="container">
-  <h2 style="text-align:center; color:#0056b3;">Protein Conjugation & Dilution Calculator</h2>
+  <h2 style="text-align:center; color:#0056b3; margin-bottom:25px;">Conjugation Calculator</h2>
 
   <div class="grid">
     <div class="card">
@@ -34,21 +35,21 @@
       <div class="input-group">
         <label>Protein MW</label>
         <div class="input-wrapper">
-          <input type="number" id="g6" value="145" oninput="calcFromMg()">
+          <input type="number" id="g6" value="145.531" oninput="syncG7G8('g7')">
           <span class="unit">kDa</span>
         </div>
       </div>
       <div class="input-group">
-        <label>Conc. (mg/mL)</label>
+        <label>Stock Conc. (mg/mL)</label>
         <div class="input-wrapper">
-          <input type="number" id="g7" value="21" oninput="calcFromMg()">
+          <input type="number" id="g7" value="21" oninput="syncG7G8('g7')">
           <span class="unit">mg/mL</span>
         </div>
       </div>
       <div class="input-group">
-        <label>Conc. (uM)</label>
+        <label>Stock Conc. (uM)</label>
         <div class="input-wrapper">
-          <input type="number" id="g8" oninput="calcFromUm()">
+          <input type="number" id="g8" oninput="syncG7G8('g8')">
           <span class="unit">uM</span>
         </div>
       </div>
@@ -59,79 +60,78 @@
       <div class="input-group">
         <label>Target Conc. (mg/mL)</label>
         <div class="input-wrapper">
-          <input type="number" id="g11" value="8" oninput="calcDilMg()">
+          <input type="number" id="g11" value="9" oninput="syncG11G12('g11')">
           <span class="unit">mg/mL</span>
         </div>
       </div>
       <div class="input-group">
         <label>Target Conc. (uM)</label>
         <div class="input-wrapper">
-          <input type="number" id="g12" oninput="calcDilUm()">
+          <input type="number" id="g12" oninput="syncG11G12('g12')">
           <span class="unit">uM</span>
         </div>
       </div>
       <div class="input-group">
-        <label>Total Volume</label>
+        <label>Total Reaction Vol</label>
         <div class="input-wrapper">
-          <input type="number" id="g15" value="300" oninput="updateAll()">
+          <input type="number" id="g15" value="300" oninput="calculateAll()">
           <span class="unit">uL</span>
         </div>
       </div>
-      <div class="info-text">※ Protein Vol & Buffer Vol 자동계산</div>
     </div>
 
     <div class="card">
-      <h3>3. TCEP Preparation (10x Stock)</h3>
+      <h3>3. TCEP Preparation (10x)</h3>
       <div class="input-group">
-        <label>TCEP Stock Conc</label>
+        <label>TCEP Stock (Fixed)</label>
         <div class="input-wrapper">
           <input type="number" id="g17" value="10" disabled>
           <span class="unit">mg/mL</span>
         </div>
       </div>
       <div class="input-group">
-        <label>TCEP Eq</label>
+        <label>TCEP Equivalents</label>
         <div class="input-wrapper">
-          <input type="number" id="tcepEq" value="8" oninput="updateAll()">
+          <input type="number" id="tcepEq" value="8" oninput="calculateAll()">
           <span class="unit">eq</span>
         </div>
       </div>
       <div class="input-group">
-        <label>Preparation Vol</label>
+        <label>Prep. Total Vol</label>
         <div class="input-wrapper">
-          <input type="number" id="g21" value="100" oninput="updateAll()">
+          <input type="number" id="g21" value="100" oninput="calculateAll()">
           <span class="unit">uL</span>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <h3>4. LP Preparation (10x Stock)</h3>
+      <h3>4. LP Preparation (10x)</h3>
       <div class="input-group">
         <label>LP Stock Conc</label>
         <div class="input-wrapper">
-          <input type="number" id="g25" value="10" oninput="updateAll()">
+          <input type="number" id="g25" value="10" oninput="calculateAll()">
           <span class="unit">mg/mL</span>
         </div>
       </div>
       <div class="input-group">
         <label>LP MW</label>
         <div class="input-wrapper">
-          <input type="number" id="g26" value="0.3023" oninput="updateAll()">
+          <input type="number" id="g26" value="0.3023" oninput="calculateAll()">
           <span class="unit">kDa</span>
         </div>
       </div>
       <div class="input-group">
-        <label>LP Eq</label>
+        <label>LP Equivalents</label>
         <div class="input-wrapper">
-          <input type="number" id="g28" value="16" oninput="updateAll()">
+          <input type="number" id="g28" value="16" oninput="calculateAll()">
           <span class="unit">eq</span>
         </div>
       </div>
       <div class="input-group">
-        <label>Preparation Vol</label>
+        <label>Prep. Total Vol</label>
         <div class="input-wrapper">
-          <input type="number" id="g31" value="100" oninput="updateAll()">
+          <input type="number" id="g31" value="100" oninput="calculateAll()">
           <span class="unit">uL</span>
         </div>
       </div>
@@ -143,116 +143,109 @@
         <thead>
           <tr>
             <th>Section</th>
-            <th>Item</th>
+            <th>Component / Parameter</th>
             <th>Value</th>
             <th>Unit</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td rowspan="2">Protein Dilution</td><td>Protein Volume</td><td id="g13" class="highlight-row">-</td><td>uL</td></tr>
-          <tr><td>Buffer Volume</td><td id="g14" class="highlight-row">-</td><td>uL</td></tr>
-          <tr><td rowspan="3">TCEP (10x Prep)</td><td>Target Conc</td><td id="g19">-</td><td>uM</td></tr>
-          <tr><td>TCEP Stock Vol</td><td id="g22" class="highlight-row">-</td><td>uL</td></tr>
-          <tr><td>Buffer Vol</td><td id="g23" class="highlight-row">-</td><td>uL</td></tr>
-          <tr><td rowspan="4">LP (10x Prep)</td><td>Stock Conc</td><td id="g27">-</td><td>uM</td></tr>
-          <tr><td>Target Conc</td><td id="g29">-</td><td>uM</td></tr>
-          <tr><td>LP Stock Vol</td><td id="g32" class="highlight-row">-</td><td>uL</td></tr>
-          <tr><td>Buffer Vol</td><td id="g33" class="highlight-row">-</td><td>uL</td></tr>
+          <tr><td rowspan="2"><b>Protein Dilution</b></td><td>Protein Volume (To take)</td><td id="res_g13" class="res-val">-</td><td>uL</td></tr>
+          <tr><td>Buffer Volume (For Dilution)</td><td id="res_g14" class="res-val">-</td><td>uL</td></tr>
+          
+          <tr><td rowspan="3"><b>TCEP (10x Prep)</b></td><td>Target Conc. (in Reaction)</td><td id="res_g19">-</td><td>uM</td></tr>
+          <tr><td>TCEP Stock Volume (To take)</td><td id="res_g22" class="res-val">-</td><td>uL</td></tr>
+          <tr><td>TCEP Buffer Volume</td><td id="res_g23" class="res-val">-</td><td>uL</td></tr>
+          
+          <tr><td rowspan="4"><b>LP (10x Prep)</b></td><td>LP Stock Conc. (uM)</td><td id="res_g27">-</td><td>uM</td></tr>
+          <tr><td>Target Conc. (in Reaction)</td><td id="res_g29">-</td><td>uM</td></tr>
+          <tr><td>LP Stock Volume (To take)</td><td id="res_g32" class="res-val">-</td><td>uL</td></tr>
+          <tr><td>LP Buffer Volume</td><td id="res_g33" class="res-val">-</td><td>uL</td></tr>
         </tbody>
       </table>
+      <p style="font-size: 11px; color: #666; margin-top: 15px; text-align: center;">
+        ※ 모든 계산은 시약 10% 첨가 시 발생하는 부피 변화를 고려한 보정 로직이 적용되었습니다.
+      </p>
     </div>
   </div>
 </div>
 
 <script>
-// 상수 설정
-const TCEP_MW = 286.65; // TCEP 분자량
-
-function updateAll() {
+// 상호 변환 및 자동 계산 로직
+function syncG7G8(source) {
   const mw = parseFloat(document.getElementById('g6').value) || 0;
-  const concMg = parseFloat(document.getElementById('g7').value) || 0;
-  const targetMg = parseFloat(document.getElementById('g11').value) || 0;
-  const targetUm = parseFloat(document.getElementById('g12').value) || 0;
-  const totalVol = parseFloat(document.getElementById('g15').value) || 0;
-  
-  // 1. Protein Dilution (G13, G14)
-  if(concMg > 0 && targetMg > 0) {
-    const vProt = (targetMg / concMg) * totalVol;
-    document.getElementById('g13').innerText = vProt.toFixed(2);
-    document.getElementById('g14').innerText = (totalVol - vProt).toFixed(2);
+  if (source === 'g7') {
+    const mg = parseFloat(document.getElementById('g7').value) || 0;
+    document.getElementById('g8').value = mw ? ((mg / mw) * 1000).toFixed(4) : 0;
+  } else {
+    const um = parseFloat(document.getElementById('g8').value) || 0;
+    document.getElementById('g7').value = mw ? ((um * mw) / 1000).toFixed(4) : 0;
+  }
+  syncG11G12('g11');
+}
+
+function syncG11G12(source) {
+  const mw = parseFloat(document.getElementById('g6').value) || 0;
+  if (source === 'g11') {
+    const mg = parseFloat(document.getElementById('g11').value) || 0;
+    document.getElementById('g12').value = mw ? ((mg / mw) * 1000).toFixed(4) : 0;
+  } else {
+    const um = parseFloat(document.getElementById('g12').value) || 0;
+    document.getElementById('g11').value = mw ? ((um * mw) / 1000).toFixed(4) : 0;
+  }
+  calculateAll();
+}
+
+function calculateAll() {
+  const g7 = parseFloat(document.getElementById('g7').value) || 0;
+  const g11 = parseFloat(document.getElementById('g11').value) || 0;
+  const g12 = parseFloat(document.getElementById('g12').value) || 0;
+  const g15 = parseFloat(document.getElementById('g15').value) || 0;
+
+  // 1. Protein Dilution
+  if (g7 > 0) {
+    const g13 = (g11 / g7) * g15;
+    const g14 = g15 - g13;
+    document.getElementById('res_g13').innerText = g13.toFixed(2);
+    document.getElementById('res_g14').innerText = g14.toFixed(2);
   }
 
   // 2. TCEP Logic
   const tcepEq = parseFloat(document.getElementById('tcepEq').value) || 0;
-  const tcepPrepVol = parseFloat(document.getElementById('g21').value) || 0;
-  const tcepStockUm = (10 / TCEP_MW) * 1000000; // G18: 약 34882 uM
-  
-  const tcepTargetUm = targetUm * tcepEq; // G19
-  const tcepTarget10x = tcepTargetUm * 10; // G20
-  const vTcepStock = (tcepTarget10x * tcepPrepVol) / tcepStockUm; // G22
-  
-  document.getElementById('g19').innerText = tcepTargetUm.toFixed(2);
-  document.getElementById('g22').innerText = vTcepStock.toFixed(2);
-  document.getElementById('g23').innerText = (tcepPrepVol - vTcepStock).toFixed(2);
+  const g18 = 34880; // Fixed TCEP Stock uM
+  const g21 = parseFloat(document.getElementById('g21').value) || 0;
+
+  const g19 = (g12 / 1.1) * tcepEq; // Dilution correction (1.1x)
+  const g20 = g19 * 10;
+  const g22 = (g20 * g21) / g18;
+  const g23 = g21 - g22;
+
+  document.getElementById('res_g19').innerText = g19.toFixed(4);
+  document.getElementById('res_g22').innerText = g22.toFixed(2);
+  document.getElementById('res_g23').innerText = g23.toFixed(2);
 
   // 3. LP Logic
-  const lpStockMg = parseFloat(document.getElementById('g25').value) || 0;
-  const lpMW = parseFloat(document.getElementById('g26').value) || 0;
-  const lpEq = parseFloat(document.getElementById('g28').value) || 0;
-  const lpPrepVol = parseFloat(document.getElementById('g31').value) || 0;
+  const g25 = parseFloat(document.getElementById('g25').value) || 0;
+  const g26 = parseFloat(document.getElementById('g26').value) || 0;
+  const g28 = parseFloat(document.getElementById('g28').value) || 0;
+  const g31 = parseFloat(document.getElementById('g31').value) || 0;
 
-  if(lpMW > 0) {
-    const lpStockUm = (lpStockMg / lpMW) * 1000; // G27
-    const lpTargetUm = targetUm * lpEq; // G29
-    const lpTarget10x = lpTargetUm * 10; // G30
-    const vLpStock = (lpTarget10x * lpPrepVol) / lpStockUm; // G32
+  if (g26 > 0) {
+    const g27 = (g25 / g26) * 1000;
+    const g29 = (g12 / 1.1) * g28;
+    const g30 = g29 * 10;
+    const g32 = (g30 * g31) / g27;
+    const g33 = g31 - g32;
 
-    document.getElementById('g27').innerText = lpStockUm.toFixed(2);
-    document.getElementById('g29').innerText = lpTargetUm.toFixed(2);
-    document.getElementById('g32').innerText = vLpStock.toFixed(2);
-    document.getElementById('g33').innerText = (lpPrepVol - vLpStock).toFixed(2);
+    document.getElementById('res_g27').innerText = g27.toFixed(2);
+    document.getElementById('res_g29').innerText = g29.toFixed(4);
+    document.getElementById('res_g32').innerText = g32.toFixed(2);
+    document.getElementById('res_g33').innerText = g33.toFixed(2);
   }
 }
 
-// 상호 변환 함수들
-function calcFromMg() {
-  const mw = parseFloat(document.getElementById('g6').value);
-  const mg = parseFloat(document.getElementById('g7').value);
-  if(mw && mg) {
-    document.getElementById('g8').value = ((mg / mw) * 1000).toFixed(4);
-    calcDilMg(); // 연쇄 업데이트
-  }
-}
-
-function calcFromUm() {
-  const mw = parseFloat(document.getElementById('g6').value);
-  const um = parseFloat(document.getElementById('g8').value);
-  if(mw && um) {
-    document.getElementById('g7').value = ((um * mw) / 1000).toFixed(4);
-    calcDilMg();
-  }
-}
-
-function calcDilMg() {
-  const mw = parseFloat(document.getElementById('g6').value);
-  const targetMg = parseFloat(document.getElementById('g11').value);
-  if(mw && targetMg) {
-    document.getElementById('g12').value = ((targetMg / mw) * 1000).toFixed(4);
-  }
-  updateAll();
-}
-
-function calcDilUm() {
-  const mw = parseFloat(document.getElementById('g6').value);
-  const targetUm = parseFloat(document.getElementById('g12').value);
-  if(mw && targetUm) {
-    document.getElementById('g11').value = ((targetUm * mw) / 1000).toFixed(4);
-  }
-  updateAll();
-}
-
-// 초기 실행
-window.onload = calcFromMg;
+window.onload = function() {
+  syncG7G8('g7');
+};
 </script>
 
 </body>
