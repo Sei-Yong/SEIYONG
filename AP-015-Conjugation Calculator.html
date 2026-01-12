@@ -233,7 +233,7 @@ function calculateAll() {
   const g18 = 34880; // Fixed TCEP Stock uM
   const g21 = parseFloat(document.getElementById('g21').value) || 0;
 
-  const g19 = (g12 / 1.1) * tcepEq; // Dilution correction (1.1x)
+  const g19 = (g12 * 1.1) * tcepEq; // Dilution correction (1.1x)
   const g20 = g19 * 10;
   const g22 = (g20 * g21) / g18;
   const g23 = g21 - g22;
@@ -250,7 +250,7 @@ function calculateAll() {
 
   if (g26 > 0) {
     const g27 = (g25 / g26) * 1000;
-    const g29 = (g12 / 1.1) * g28;
+    const g29 = (g12 * 1.1) * g28;
     const g30 = g29 * 10;
     const g32 = (g30 * g31) / g27;
     const g33 = g31 - g32;
