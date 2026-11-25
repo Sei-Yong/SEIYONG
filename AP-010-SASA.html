@@ -1,18 +1,42 @@
 <!doctype html>
-<html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Residue SASA Calculator</title>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Residue SASA Calculator</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f3f6f5;color:#183730;font:15px/1.55 "Inter","Malgun Gothic",sans-serif}main{max-width:1080px;margin:auto;padding:clamp(20px,5vw,64px) 20px}h1{font-size:clamp(28px,5vw,43px);line-height:1.2;letter-spacing:-.05em;margin:0}header p{color:#49665e;margin:10px 0 28px}section,details{background:white;border:1px solid #cadad4;border-radius:12px;padding:20px;margin:14px 0}form{display:flex;align-items:center;gap:14px;flex-wrap:wrap}label,h2,summary{font-weight:700}h2{font-size:18px;margin:0 0 14px}input{max-width:100%;min-width:0}button,input::file-selector-button{padding:8px 15px;border-radius:6px;border:1px solid #b1c7bf;background:#f5faf7;color:#203e34;font:inherit;cursor:pointer}button{background:#186953;color:white;border-color:#186953;margin-left:auto;font-weight:650}button:disabled{opacity:.5;cursor:default}#status{font-size:14px;color:#42675c;margin:12px 0 0}.scroll{overflow:auto;max-height:62vh}table{width:100%;border-collapse:separate;border-spacing:0;white-space:nowrap;font-variant-numeric:tabular-nums}th,td{padding:9px 12px;border-bottom:1px solid #e2eae6;text-align:right}th{position:sticky;top:0;color:#3c5e52;background:#ecf4ef;font-size:13px}th:nth-child(-n+3),td:nth-child(-n+3){text-align:left}summary{cursor:pointer}details p{margin:10px 0 0}#status:empty{display:none}
-.settings{display:flex;flex-wrap:wrap;align-items:end;gap:14px}.settings label{display:grid;gap:4px;font-size:14px}.settings input,.settings select{font:inherit;padding:7px;border:1px solid #a9beb5;border-radius:6px}.settings input[type=number]{width:6em}#ranges{width:min(340px,74vw)}.hint{color:#476357;font-size:14px}.settings [hidden]{display:none}.subhead{font-size:15px;margin:16px 0 6px}#recommendation .scroll{max-height:36vh}</style>
-<main><header><h1>Residue SASA Calculator</h1><p>PDB / mmCIF 구조에서 잔기별 용매 접근 가능 표면적과 측쇄의 기여도를 계산합니다.</p></header>
-<section><form id="form"><label for="file">PDB / mmCIF 구조 파일</label><input id="file" type="file" accept=".pdb,.ent,.cif,.mmcif" required><button id="run" disabled>SASA 계산</button></form><p id="status" role="status" aria-live="polite"></p></section>
-<section id="recommendation" hidden><h2>표면 노출 변이 후보</h2>
-<div class="settings"><label>탐색 영역<select id="scope"><option value="ranges">CDR / 지정 범위</option><option value="all">전체 구조</option></select></label>
-<label id="range-label">체인과 구조 파일의 잔기 번호<input id="ranges" placeholder="예: H:26-32, L:50-56" autocomplete="off"></label>
-<label>최소 상대 SASA (%)<input type="number" id="threshold" min="0" step="any" value="25"></label></div>
-<p id="chain-hint" class="hint"></p><p class="hint">노출 위치는 상대 SASA가 높은 순서로 표시합니다. 동률이면 측쇄 SASA가 큰 위치가 먼저입니다. 기준을 통과한 Cys·Gly·Pro, 불완전한 잔기, 측쇄 노출 면적이 0인 위치는 별도 검토 목록에 표시합니다.</p>
+.settings{display:flex;flex-wrap:wrap;align-items:end;gap:14px}.settings label{display:grid;gap:4px;font-size:14px}.settings input,.settings select{font:inherit;padding:7px;border:1px solid #a9beb5;border-radius:6px}.settings input[type=number]{width:6em}#ranges{width:min(340px,74vw)}.hint{color:#476357;font-size:14px}.settings [hidden]{display:none}.subhead{font-size:15px;margin:16px 0 6px}#recommendation .scroll{max-height:36vh}
+body{background:#f3f5ef;color:#1c392f;font-family:Inter,"Segoe UI","Malgun Gothic",sans-serif}
+main{max-width:1100px;padding:clamp(16px,4vw,50px)}
+nav a{color:#45634f;text-decoration:none}nav a:hover{text-decoration:underline}
+header{background:#193d32;color:#fbfff6;border-radius:16px;padding:clamp(23px,4vw,40px);margin:20px 0 16px}
+h1{font:500 clamp(36px,5vw,57px)/1.06 Georgia,serif;letter-spacing:-.045em}
+header p{color:#d7e7d8;margin:12px 0 0}
+section,details{border:1px solid #cddbd0;border-radius:15px;padding:clamp(16px,3vw,28px);margin:0 0 16px}
+h2,form label{font-size:20px;letter-spacing:-.035em}
+form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center}
+form label{grid-column:1/-1}
+input[type=file]{width:100%;padding:6px;border:1px solid #afc3b5;border-radius:8px;background:#f8faf6;font:inherit}
+input::file-selector-button{margin-right:12px;padding:5px 12px;background:#e6eee6}
+button{border-radius:7px;padding:10px 18px;background:#215e48;border-color:#215e48}
+button:enabled:hover{background:#193d32}
+.settings{display:grid;grid-template-columns:auto minmax(0,1fr) auto;padding:16px;border-radius:9px;background:#f4f7f2}
+.settings input,.settings select{color:#193d32;background:white;padding:9px;border-color:#afc3b5}
+#ranges{width:100%}.hint,details p{color:#496455}
+.scroll{border:1px solid #d5e1d7;border-radius:8px}
+th{background:#e6eee6;color:#345541}tbody tr:nth-child(even){background:#f8faf6}
+tbody tr:hover{background:#eff6e7}
+:focus-visible{outline:3px solid #83a990;outline-offset:2px}
+footer{font-size:13px;color:#526b59}
+@media(max-width:650px){form,.settings{grid-template-columns:1fr}button,.settings input[type=number]{width:100%}}
+</style>
+<main><nav><a href="AP-000-Main.html">← Back to Main</a></nav><header><h1>Residue SASA Calculator</h1><p>Calculate solvent-accessible surface area (SASA) for each residue and its side chain from a PDB or mmCIF structure.</p></header>
+<section><form id="form"><label for="file">Structure file (PDB or mmCIF)</label><input id="file" type="file" accept=".pdb,.ent,.cif,.mmcif" required><button id="run" disabled>Calculate SASA</button></form><p id="status" role="status" aria-live="polite"></p></section>
+<section id="recommendation" hidden><h2>Surface-exposed mutation candidates</h2>
+<div class="settings"><label>Search region<select id="scope"><option value="ranges">CDR or custom ranges</option><option value="all">Entire structure</option></select></label>
+<label id="range-label">Chain and residue ranges<input id="ranges" placeholder="e.g. H:26-32, L:50-56" autocomplete="off"></label>
+<label>Minimum relative SASA (%)<input type="number" id="threshold" min="0" step="any" value="25"></label></div>
+<p id="chain-hint" class="hint"></p><p class="hint">Positions are ranked by relative SASA, with side-chain SASA used to break ties. Qualifying Cys, Gly and Pro residues, incomplete residues and residues with zero side-chain SASA appear under “Positions for review”.</p>
 <p id="rec-status" role="status"></p><div id="rec-tables"></div></section>
-<section id="output" hidden><h2>잔기별 결과</h2><div class="scroll"><table><thead><tr><th>Chain</th><th>잔기 번호</th><th>잔기명</th><th>전체 SASA (Å²)</th><th>상대 SASA (%)</th><th>측쇄 SASA (Å²)</th><th>측쇄 비율 (%)</th></tr></thead><tbody id="rows"></tbody></table></div></section>
-<details><summary>계산 방법과 결과 해석</summary><p>입력 구조의 모든 체인을 함께 계산합니다. Lee–Richards 방식으로 원자 표면을 20개 단면으로 나누며, ProtOr 원자 반지름에 1.4 Å의 probe 반지름을 더합니다.</p><p>전체 SASA는 해당 잔기 원자의 노출 면적 합입니다. 상대 SASA는 전체 SASA ÷ 원본 코드의 잔기별 최대 SASA × 100입니다. 100%를 넘을 수 있으며 기준값이 없는 잔기는 N/A입니다.</p><p>측쇄 SASA는 주사슬 원자(N, CA, C, O, OXT)를 제외한 면적입니다. 측쇄 비율은 측쇄 SASA ÷ 전체 SASA × 100이며 전체 면적이 0이면 N/A입니다.</p><p>mmCIF는 author 체인·잔기 번호를 우선 사용하며 값이 없으면 label 번호를 사용합니다. 첫 번째 모델의 ATOM 레코드를 읽고 수소·중수소와 HETATM은 제외합니다. 대체 배치는 각 잔기에서 먼저 등장한 배치와 공통 원자를 사용합니다. 분류표에 없는 원자명은 지원하지 않으며 해당 위치를 표시합니다. 파일은 브라우저 안에서 처리합니다.</p></details></main>
+<section id="output" hidden><h2>Per-residue results</h2><div class="scroll"><table><thead><tr><th>Chain</th><th>Residue number</th><th>Residue name</th><th>Total SASA (Å²)</th><th>Relative SASA (%)</th><th>Side-chain SASA (Å²)</th><th>Side-chain fraction (%)</th></tr></thead><tbody id="rows"></tbody></table></div></section>
+<details><summary>Calculation method and interpretation</summary><p>All chains are analyzed together. The Lee–Richards calculation uses 20 slices per atom, ProtOr atomic radii and a probe radius of 1.4 Å.</p><p><strong>Total SASA</strong> is the sum of the solvent-accessible areas of all atoms in a residue. <strong>Relative SASA</strong> is total SASA divided by the reference maximum for that residue type, multiplied by 100. Values can exceed 100%. N/A indicates that the residue has no reference value.</p><p><strong>Side-chain SASA</strong> is the accessible area of atoms other than N, CA, C, O and OXT. <strong>Side-chain fraction</strong> is the percentage of total SASA contributed by the side chain. If total SASA is zero, the fraction is shown as N/A.</p><p>For mmCIF files, the calculator uses author chain and residue identifiers when available and falls back to label identifiers. It reads ATOM records from the first model and excludes hydrogen, deuterium and HETATM records. For each residue with alternate conformations, it uses the first conformation encountered along with shared atoms. If an atom name has no assigned radius, the calculator reports its location. Files are processed in your browser.</p></details><footer>© 2025–2026 Sei-Yong Jun. All rights reserved.</footer></main>
 <script>
 'use strict';
 const radii={"ALA":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"OXT":1.46},"ARG":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.88,"CD":1.88,"NE":1.64,"CZ":1.61,"NH1":1.64,"NH2":1.64,"OXT":1.46},"ASN":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.61,"OD1":1.42,"ND2":1.64,"OXT":1.46},"ASP":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.61,"OD1":1.42,"OD2":1.46,"OXT":1.46},"CYS":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"SG":1.77,"OXT":1.46},"GLN":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.88,"CD":1.61,"OE1":1.42,"NE2":1.64,"OXT":1.46},"GLU":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.88,"CD":1.61,"OE1":1.42,"OE2":1.46,"OXT":1.46},"GLY":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"OXT":1.46},"HIS":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.61,"ND1":1.64,"CD2":1.76,"CE1":1.76,"NE2":1.64,"OXT":1.46},"ILE":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG1":1.88,"CG2":1.88,"CD1":1.88,"OXT":1.46},"LEU":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.88,"CD1":1.88,"CD2":1.88,"OXT":1.46},"LYS":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.88,"CD":1.88,"CE":1.88,"NZ":1.64,"OXT":1.46},"MET":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.88,"SD":1.77,"CE":1.88,"OXT":1.46},"PHE":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.61,"CD1":1.76,"CD2":1.76,"CE1":1.76,"CE2":1.76,"CZ":1.76,"OXT":1.46},"PRO":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.88,"CD":1.88,"OXT":1.46},"SER":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"OG":1.46,"OXT":1.46},"THR":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"OG1":1.46,"CG2":1.88,"OXT":1.46},"TRP":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.61,"CD1":1.76,"CD2":1.61,"NE1":1.64,"CE2":1.61,"CE3":1.76,"CZ2":1.76,"CZ3":1.76,"CH2":1.76,"OXT":1.46},"TYR":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.61,"CD1":1.76,"CD2":1.76,"CE1":1.76,"CE2":1.76,"CZ":1.61,"OH":1.46,"OXT":1.46},"VAL":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG1":1.88,"CG2":1.88,"OXT":1.46},"ASX":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.61,"XD1":1.5,"XD2":1.5,"OXT":1.46},"GLX":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.88,"CD":1.61,"XE1":1.5,"XE2":1.5,"OXT":1.46},"PYL":{"CB2":1.88,"CG2":1.88,"CD2":1.88,"CE2":1.76,"N2":1.64,"CA2":1.88,"C2":1.61,"O2":1.42,"NZ":1.64,"CE":1.88,"CD":1.88,"CG":1.88,"CB":1.88,"CA":1.88,"C":1.61,"OXT":1.46,"O":1.42,"N":1.64},"SEC":{"N":1.64,"CA":1.88,"CB":1.88,"SE":1.9,"C":1.61,"O":1.42,"OXT":1.46},"MSE":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"OXT":1.46,"CB":1.88,"CG":1.88,"SE":1.9,"CE":1.88},"HOH":{"O":1.46},"NH2":{"N":1.64},"ACE":{"C":1.76,"O":1.42,"CH3":1.88},"A":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"O2'":1.46,"C1'":1.88,"N9":1.64,"C8":1.76,"N7":1.64,"C5":1.61,"C6":1.61,"N6":1.64,"N1":1.64,"C2":1.76,"N3":1.64,"C4":1.61},"C":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"O2'":1.46,"C1'":1.88,"N1":1.64,"C2":1.61,"O2":1.42,"N3":1.64,"C4":1.61,"N4":1.64,"C5":1.76,"C6":1.76},"G":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"O2'":1.46,"C1'":1.88,"N9":1.64,"C8":1.76,"N7":1.64,"C5":1.61,"C6":1.61,"O6":1.42,"N1":1.64,"C2":1.61,"N2":1.64,"N3":1.64,"C4":1.61},"I":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"O2'":1.46,"C1'":1.88,"N9":1.64,"C8":1.76,"N7":1.64,"C5":1.61,"C6":1.61,"O6":1.42,"N1":1.64,"C2":1.76,"N3":1.64,"C4":1.61},"T":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"C1'":1.88,"N1":1.64,"C2":1.61,"O2":1.42,"N3":1.64,"C4":1.61,"O4":1.42,"C5":1.61,"C7":1.88,"C6":1.76},"U":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"O2'":1.46,"C1'":1.88,"N1":1.64,"C2":1.61,"O2":1.42,"N3":1.64,"C4":1.61,"O4":1.42,"C5":1.76,"C6":1.76},"DA":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"C1'":1.88,"N9":1.64,"C8":1.76,"N7":1.64,"C5":1.61,"C6":1.61,"N6":1.64,"N1":1.64,"C2":1.76,"N3":1.64,"C4":1.61},"DC":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"C1'":1.88,"N1":1.64,"C2":1.61,"O2":1.42,"N3":1.64,"C4":1.61,"N4":1.64,"C5":1.76,"C6":1.76},"DG":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"C1'":1.88,"N9":1.64,"C8":1.76,"N7":1.64,"C5":1.61,"C6":1.61,"O6":1.42,"N1":1.64,"C2":1.61,"N2":1.64,"N3":1.64,"C4":1.61},"DI":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"C1'":1.88,"N9":1.64,"C8":1.76,"N7":1.64,"C5":1.61,"C6":1.61,"O6":1.42,"N1":1.64,"C2":1.76,"N3":1.64,"C4":1.61},"DT":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"C1'":1.88,"N1":1.64,"C2":1.61,"O2":1.42,"N3":1.64,"C4":1.61,"O4":1.42,"C5":1.61,"C7":1.88,"C6":1.76},"DU":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"C1'":1.88,"N1":1.64,"C2":1.61,"O2":1.42,"N3":1.64,"C4":1.61,"O4":1.42,"C5":1.76,"C6":1.76}};
@@ -36,7 +60,7 @@ function* cifTokens(text){
   if(line.startsWith(';')){
    const block=[line.slice(1)];
    while(++i<lines.length&&!lines[i].startsWith(';'))block.push(lines[i]);
-   if(i===lines.length)throw Error('닫히지 않은 CIF 텍스트 필드입니다.');
+   if(i===lines.length)throw Error('Unterminated CIF text field.');
    yield {value:block.join('\n'),literal:true};continue;
   }
   let j=0;
@@ -48,7 +72,7 @@ function* cifTokens(text){
    const start=j;
    if(literal){
     while(j<line.length&&!(line[j]===quote&&(j+1===line.length||/\s/.test(line[j+1]))))j++;
-    if(j===line.length)throw Error('닫히지 않은 CIF 따옴표입니다.');
+    if(j===line.length)throw Error('Unterminated quoted string in the CIF file.');
    }else while(j<line.length&&!/\s/.test(line[j]))j++;
    yield {value:line.slice(start,j),literal};
    if(literal)j++;
@@ -68,13 +92,13 @@ function* cifRecords(text){
   if(!headers.includes('_atom_site.cartn_x'))continue;
   const columns=new Map(headers.map((h,i)=>[h,i]));
   for(const col of ['group_pdb','cartn_x','cartn_y','cartn_z']){
-   if(!columns.has('_atom_site.'+col))throw Error('mmCIF 좌표 열이 없습니다: '+col);
+   if(!columns.has('_atom_site.'+col))throw Error('Missing mmCIF coordinate column: '+col);
   }
   let model;
   while(token&&!control(token)){
    const values=[];
    for(let i=0;i<headers.length;i++){
-    if(!token||control(token))throw Error('mmCIF 원자 행의 열 개수가 맞지 않습니다.');
+    if(!token||control(token))throw Error('An mmCIF atom row has the wrong number of columns.');
     values.push(token.value);next();
    }
    function get(...names){
@@ -89,13 +113,13 @@ function* cifRecords(text){
    if(model!==current||get('group_pdb').toUpperCase()!=='ATOM')continue;
    const name=get('auth_atom_id','label_atom_id'),res=get('auth_comp_id','label_comp_id');
    const num=get('auth_seq_id','label_seq_id');
-   if(!name||!res||!num)throw Error('mmCIF의 원자명, 잔기명 또는 잔기 번호가 누락되었습니다.');
+   if(!name||!res||!num)throw Error('An mmCIF atom row is missing an atom name, residue name or residue number.');
    yield {name,res,num,chain:get('auth_asym_id','label_asym_id'),ins:get('pdbx_pdb_ins_code'),alt:get('label_alt_id','auth_alt_id'),
     element:get('type_symbol').toUpperCase()||name.replace(/^\d+/,'')[0],coords:['cartn_x','cartn_y','cartn_z'].map(col=>get(col))};
   }
   return;
  }
- throw Error('단백질 mmCIF의 _atom_site 좌표 표를 찾지 못했습니다.');
+ throw Error('The mmCIF file has no _atom_site coordinate table.');
 }
 function parseStructure(text,filename){
  const atoms=[],residues=new Map();
@@ -108,12 +132,12 @@ function parseStructure(text,filename){
   if(alt){if(!row.alt)row.alt=alt;if(alt!==row.alt)continue}
   if(row.names.has(name))continue;
   const radius=radii[res]?.[name];
-  if(!Number.isFinite(radius))throw Error(`원자 반지름을 찾을 수 없습니다 (${chain} ${res} ${num}${ins} ${name}).`);
-  if(coords.some(v=>v===''||!Number.isFinite(Number(v))))throw Error(`좌표를 확인하세요 (${chain} ${res} ${num}${ins} ${name}).`);
+  if(!Number.isFinite(radius))throw Error(`Unknown atomic radius (${chain} ${res} ${num}${ins} ${name}).`);
+  if(coords.some(v=>v===''||!Number.isFinite(Number(v))))throw Error(`Invalid atomic coordinates (${chain} ${res} ${num}${ins} ${name}).`);
   const [x,y,z]=coords.map(Number);
   atoms.push({x,y,z,r:radius+probe,row,name});row.names.add(name);
  }
- if(!atoms.length)throw Error('첫 모델에서 계산할 ATOM 레코드를 찾지 못했습니다. 구조 파일 형식을 확인하세요.');
+ if(!atoms.length)throw Error('No usable ATOM records were found in the first model. Check the structure file format.');
  return {atoms,residues};
 }
 // A grid cell spans at least the largest possible diameter.
@@ -174,16 +198,16 @@ let analyzedRows=[];
 const scope=byId('scope'),ranges=byId('ranges'),threshold=byId('threshold');
 function pdbPosition(value){
  const m=/^(-?\d+)([A-Za-z]?)$/.exec(value);
- if(!m)throw Error('PDB 잔기 번호를 확인하세요.');
+ if(!m)throw Error('Check the residue number in the structure file.');
  return {n:Number(m[1]),ins:m[2]};
 }
 function comparePosition(a,b){return a.n-b.n || a.ins.localeCompare(b.ins)}
 function parseRanges(text){
  return text.split(/[,;\n]+/).map(x=>x.trim()).filter(Boolean).map(part=>{
   const m=/^([^\s:,;]+)\s*:\s*(-?\d+[A-Za-z]?)(?:\s*-\s*(-?\d+[A-Za-z]?))?$/.exec(part);
-  if(!m)throw Error('범위 형식을 확인하세요. 예: H:26-32, L:50-56');
+  if(!m)throw Error('Enter ranges in this format: H:26-32, L:50-56.');
   const lo=pdbPosition(m[2]),hi=pdbPosition(m[3]||m[2]);
-  if(comparePosition(lo,hi)>0)throw Error('범위의 시작 번호가 끝 번호보다 큽니다.');
+  if(comparePosition(lo,hi)>0)throw Error('The start of a range exceeds its end.');
   return {part,chain:m[1]==='—'?'':m[1],lo,hi};
  });
 }
@@ -200,11 +224,11 @@ function recommend(rows,regions,minRSA){
   const rsa=row.total/maxima[row.res]*100;
   if(rsa<minRSA)continue;
   const reasons=[];
-  const special={CYS:'이황화결합 여부 확인',GLY:'WT 측쇄 없음',PRO:'주사슬 형태 확인'};
+  const special={CYS:'Check for a disulfide bond',GLY:'No wild-type side chain',PRO:'Review backbone conformation'};
   if(special[row.res])reasons.push(special[row.res]);
   const missing=Object.keys(radii[row.res]).filter(name=>name!=='OXT'&&!row.names.has(name));
-  if(missing.length)reasons.push('누락 원자 '+missing.join(', '));
-  if(!row.side&&row.res!=='GLY')reasons.push('측쇄 노출 면적 0');
+  if(missing.length)reasons.push('Missing atoms: '+missing.join(', '));
+  if(!row.side&&row.res!=='GLY')reasons.push('Zero side-chain SASA');
   (reasons.length?review:primary).push({row,rsa,reason:reasons.join(' · ')});
  }
  for(const list of [primary,review])list.sort((a,b)=>b.rsa-a.rsa||b.row.side-a.row.side);
@@ -215,7 +239,7 @@ function showCandidates(title,items,review){
  const host=byId('rec-tables'),heading=document.createElement('h3'),wrap=document.createElement('div'),table=document.createElement('table');
  heading.className='subhead';heading.textContent=title;wrap.className='scroll';
  const header=table.createTHead().insertRow();
- for(const name of ['Chain','잔기','상대 SASA (%)','측쇄 SASA (Å²)',...(review?['검토 사유']:[])]){
+ for(const name of ['Chain','Residue','Relative SASA (%)','Side-chain SASA (Å²)',...(review?['Reason for review']:[])]){
   const th=document.createElement('th');th.textContent=name;header.append(th);
  }
  const tbody=table.createTBody();
@@ -231,21 +255,21 @@ function refreshRecommendations(){
  byId('range-label').hidden=!useRanges;
  try{
   const min=threshold.valueAsNumber;
-  if(!Number.isFinite(min)||min<0)throw Error('최소 상대 SASA에 0 이상의 숫자를 입력하세요.');
+  if(!Number.isFinite(min)||min<0)throw Error('Enter a minimum relative SASA of zero or greater.');
   const regions=useRanges?parseRanges(ranges.value):null;
-  if(useRanges&&!regions.length)throw Error('CDR 또는 관심 범위를 구조 파일 번호로 입력하세요. 모든 표면을 보려면 전체 구조를 선택하세요.');
+  if(useRanges&&!regions.length)throw Error('Enter CDR or custom ranges using the residue numbers in your structure, or select Entire structure to include all residues.');
   const {primary,review,unmatched}=recommend(analyzedRows,regions,min);
-  status.textContent='추천 '+primary.length+'개 · 별도 검토 '+review.length+'개'+(unmatched.length?' · 구조에서 찾지 못한 범위: '+unmatched.join(', '):'');
-  showCandidates('추천 위치',primary,false);showCandidates('별도 검토',review,true);
+  status.textContent='Recommended: '+primary.length+' · For review: '+review.length+(unmatched.length?' · Ranges absent from the structure: '+unmatched.join(', '):'');
+  showCandidates('Recommended positions',primary,false);showCandidates('Positions for review',review,true);
  }catch(error){status.textContent=error.message}
 }
 scope.onchange=ranges.oninput=threshold.oninput=refreshRecommendations;
 file.onchange=()=>{analyzedRows=[];ranges.value='';byId('recommendation').hidden=true;run.disabled=!file.files.length;output.hidden=true;body.replaceChildren();statusLine.textContent=''};
 byId('form').onsubmit=async event=>{
  event.preventDefault();const pdb=file.files[0];if(!pdb)return;
- byId('recommendation').hidden=true;run.disabled=file.disabled=true;output.hidden=true;body.replaceChildren();statusLine.textContent='PDB / mmCIF 구조를 읽는 중…';
+ byId('recommendation').hidden=true;run.disabled=file.disabled=true;output.hidden=true;body.replaceChildren();statusLine.textContent='Reading the structure file…';
  try{
-  const rows=await calculate(await pdb.text(),async(done,total)=>{statusLine.textContent=`원자 표면 계산 중 · ${Math.floor(done/total*100)}%`;await new Promise(resolve=>setTimeout(resolve,0))},pdb.name);
+  const rows=await calculate(await pdb.text(),async(done,total)=>{statusLine.textContent=`Calculating atomic surface areas · ${Math.floor(done/total*100)}%`;await new Promise(resolve=>setTimeout(resolve,0))},pdb.name);
   const fragment=document.createDocumentFragment();
   for(const row of rows){
    const {chain,num,ins,res,total,side}=row;
@@ -253,9 +277,9 @@ byId('form').onsubmit=async event=>{
    const tr=document.createElement('tr');for(const v of values){const td=document.createElement('td');td.textContent=v;tr.append(td)}fragment.append(tr);
   }
   analyzedRows=rows;
-  byId('chain-hint').textContent='구조의 체인 '+[...new Set(rows.map(r=>r.chain||'—'))].join(', ')+' · 삽입 번호는 H:100A처럼 입력합니다. CDR 경계는 직접 지정합니다.';
+  byId('chain-hint').textContent='Chains in structure: '+[...new Set(rows.map(r=>r.chain||'—'))].join(', ')+' · Include insertion codes where applicable (e.g. H:100A). Enter CDR boundaries manually.';
   byId('recommendation').hidden=false;refreshRecommendations();
-  body.append(fragment);output.hidden=false;statusLine.textContent=`${pdb.name} · ${rows.length.toLocaleString()}개 잔기 계산 완료`;
+  body.append(fragment);output.hidden=false;statusLine.textContent=`${pdb.name} · ${rows.length.toLocaleString()} residues analyzed`;
  }catch(error){statusLine.textContent=error.message}finally{run.disabled=file.disabled=false}
 };
 </script></html>
