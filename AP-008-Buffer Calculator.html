@@ -1,29 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Buffer Calculator</title>
-<style>
-  body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 40px; }
-  .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-  select, input[type="number"] { width: 150px; margin: 5px 0; padding: 5px; }
-  table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-  th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: center; }
-  .yellow { background-color: #ffff99; }
-  .center { text-align: center; margin-top: 20px; }
-  .warning-alert { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 10px; margin: 10px 0; border-radius: 4px; }
-  footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }
-</style>
+<style>*{box-sizing:border-box}
+body{margin:0;background:#f3f5ef;color:#1c392f;font:15px/1.55 Inter,"Segoe UI",sans-serif}
+main{max-width:1050px;margin:auto;padding:clamp(16px,4vw,48px)}
+nav a{color:#45634f;text-decoration:none}nav a:hover{text-decoration:underline}
+header{background:#193d32;color:#fbfff6;border-radius:16px;padding:clamp(23px,4vw,40px);margin:20px 0 16px}
+h1{font:500 clamp(36px,5vw,57px)/1.06 Georgia,serif;letter-spacing:-.045em;margin:0}header p{color:#d7e7d8;margin:12px 0 0}
+section{padding:clamp(16px,3vw,28px);margin-bottom:16px;background:#fff;border:1px solid #cddbd0;border-radius:15px}
+h2{font-size:21px;margin:0 0 14px}.layout{display:grid;grid-template-columns:minmax(160px,.7fr) minmax(0,1.5fr);gap:clamp(16px,4vw,40px)}
+label,th{font-weight:600}select,input,button{font:inherit;border-radius:7px}
+select,input{width:100%;padding:8px 10px;border:1px solid #afc3b5;background:#f8faf6;color:#193d32}
+#bufferType{margin-top:7px}table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:8px;border-bottom:1px solid #e4ebe4}#commonInputs th{width:55%}
+button{margin-top:14px;padding:10px 18px;border:0;color:#fff;background:#215e48;font-weight:650;cursor:pointer}button:hover{background:#193d32}
+:focus-visible{outline:3px solid #83a990;outline-offset:2px}
+#results{overflow:auto}#results:empty{display:none}#results table th{background:#edf3ed;color:#345541}#results td:not(:first-child){white-space:nowrap}
+.warning-alert{color:#734a12;background:#fff4d8;border-radius:7px;padding:10px 14px;margin:10px 0}
+footer{color:#526b59;font-size:13px}@media(max-width:650px){.layout{grid-template-columns:1fr}button{width:100%}}</style>
 </head>
 
 <body>
-<div class="container">
-<h2 class="center">Buffer Calculator</h2>
+<main><nav><a href="AP-000-Main.html">← Back to Main</a></nav>
+<header><h1>Buffer Calculator</h1><p>Calculate reagent amounts per liter for your selected buffer.</p></header><section><h2>Buffer settings</h2>
 
-<div id="warningContainer" style="display:none;"></div>
+<div role="status" id="warningContainer" style="display:none;"></div>
 
-<div class="center">
-  <label for="bufferType">Select Buffer Type: </label>
+<div class="layout"><div>
+  <label for="bufferType">Buffer type</label>
   <select id="bufferType" class="yellow" onchange="updateBufferForm()">
     <option value="phosphate">Phosphate Buffer</option>
     <option value="acetate">Acetate Buffer</option>
@@ -36,7 +42,7 @@
 <div id="commonInputs" class="center">
   <table>
     <tr id="goodsBufferRow" style="display:none;">
-      <th>Select Good's Buffer</th>
+      <th><label for="goodsBufferSelect">Select Good's Buffer</label></th>
       <td>
         <select id="goodsBufferSelect" class="yellow" onchange="updateGoodsDefault()">
           <option value="HEPES">HEPES</option>
@@ -49,7 +55,7 @@
       </td>
     </tr>
     <tr id="pHRow">
-      <th>Target pH</th>
+      <th><label for="pH">Target pH</label></th>
       <td><input type="number" id="pH" class="yellow" step="0.01" value="7.40" min="2" max="12"></td>
     </tr>
     <tr id="pHRangeRow" style="display:none;">
@@ -57,15 +63,15 @@
       <td id="pHRangeText">–</td>
     </tr>
     <tr>
-      <th>Buffer Strength (mM)</th>
+      <th><label for="strength">Buffer Strength (mM)</label></th>
       <td><input type="number" id="strength" class="yellow" step="0.1" value="100" min="10" max="500"></td>
     </tr>
     <tr id="NaClRow">
-      <th>NaCl Concentration (mM)</th>
+      <th><label for="NaCl">NaCl Concentration (mM)</label></th>
       <td><input type="number" id="NaCl" class="yellow" step="0.1" value="137" min="0"></td>
     </tr>
     <tr id="KClRow">
-      <th>KCl Concentration (mM)</th>
+      <th><label for="KCl">KCl Concentration (mM)</label></th>
       <td><input type="number" id="KCl" class="yellow" step="0.1" value="2.7" min="0"></td>
     </tr>
   </table>
@@ -75,18 +81,8 @@
   </div>
 </div>
 
-<div id="results"></div>
-
-<div class="center" style="margin-top: 30px;">
-  <a href="AP-000-Main.html" style="font-size: 16px; color: #007acc; text-decoration: none;">&larr; Back to Main</a>
-</div>
-
-</div>
-
-<footer>
-Copyright 2025-2026. Jun Sei-Yong All rights reserved.
-</footer>
-
+</div></section><section id="results" aria-live="polite"></section>
+<footer>© 2025–2026 Sei-Yong Jun. All rights reserved.</footer></main>
 <script>
 const goodsBufferData = {
   HEPES: { defaultStrength: 25, mw: 238.3, pHRange: "6.8–8.2" },
@@ -166,7 +162,7 @@ function calculateBuffer() {
   const type = document.getElementById("bufferType").value;
   const pH = parseFloat(document.getElementById("pH").value);
   const strength_mM = parseFloat(document.getElementById("strength").value);
-  let html = `<table><tr><th colspan="4">Buffer Components</th></tr>`;
+  let html = `<h2>Buffer components</h2><table><tr><th>Reagent</th><th>Concentration</th><th>Mass per liter</th><th>Stock volume per liter</th></tr>`;
 
   if (type === "phosphate") {
     const NaCl_mM = parseFloat(document.getElementById("NaCl").value);
@@ -234,6 +230,5 @@ window.onload = () => updateBufferForm();
 
 </body>
 </html>
-
 
 
