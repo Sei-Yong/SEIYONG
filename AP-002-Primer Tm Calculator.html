@@ -1,177 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Oligo Tm Calculator</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
-      background-color: #f2f2f2;
-    }
-    .container {
-      background: #fff;
-      padding: 30px;
-      border-radius: 12px;
-      max-width: 600px;
-      margin: auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    input, textarea, button {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-    }
-    button {
-      background-color: #0077cc;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #005fa3;
-    }
-    .result {
-      font-weight: bold;
-      font-size: 18px;
-      margin-top: 10px;
-      color: #333;
-    }
-    .button-group {
-      display: flex;
-      gap: 10px;
-    }
-    footer {
-      text-align: center;
-      margin-top: 40px;
-      color: #666;
-      font-size: 14px;
-    }
-    footer img {
-      height: 50px;
-      margin-bottom: 10px;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1 style="text-align: center;">Oligonucleotide Tm Calculator</h1>
-    <label for="sequence">Enter DNA sequence (5'→3'):</label>
-    <textarea id="sequence" rows="3" placeholder="e.g. ATGCGTACGTA"></textarea>
-
-    <div class="button-group">
-      <button onclick="calculateBasicTm()">Calculate Basic Tm</button>
-      <button onclick="swapStrands()">Swap Strands</button>
-    </div>
-
-    <div class="result" id="basicTm"></div>
-    <div class="result" id="gcContent"></div>
-    <div class="result" id="primerLength"></div>
-
-    <div style="text-align: center; margin-top: 30px;">
-      <a href="AP-000-Main.html" style="font-size: 16px; color: #007acc; text-decoration: none;">&larr; Back to Main</a>
-    </div>
-  </div>
-
-  <footer>
-    <div>Copyright 2025-2026. Jun Sei-Yong All rights reserved.</div>
-  </footer>
-
-  <script>
-    const degenerateMap = {
-      A: ['A'], T: ['T'], G: ['G'], C: ['C'],
-      R: ['A', 'G'], Y: ['C', 'T'],
-      S: ['G', 'C'], W: ['A', 'T'],
-      K: ['G', 'T'], M: ['A', 'C'],
-      B: ['C', 'G', 'T'], D: ['A', 'G', 'T'],
-      H: ['A', 'C', 'T'], V: ['A', 'C', 'G'],
-      N: ['A', 'T', 'G', 'C']
-    };
-
-    const complementMap = {
-      A: 'T', T: 'A', G: 'C', C: 'G',
-      R: 'Y', Y: 'R', S: 'S', W: 'W',
-      K: 'M', M: 'K', B: 'V', D: 'H',
-      H: 'D', V: 'B', N: 'N'
-    };
-
-    function calculateBasicTm() {
-      const inputSeq = document.getElementById('sequence').value.toUpperCase().replace(/\s+/g, '');
-      const sequences = expandDegenerate(inputSeq);
-
-      if (sequences.length === 0) {
-        document.getElementById('basicTm').innerText = 'Invalid sequence.';
-        return;
-      }
-
-      let minTm = Infinity;
-      let maxTm = -Infinity;
-      let totalGC = 0;
-      let totalLength = 0;
-
-      for (const seq of sequences) {
-        const A = (seq.match(/A/g) || []).length;
-        const T = (seq.match(/T/g) || []).length;
-        const G = (seq.match(/G/g) || []).length;
-        const C = (seq.match(/C/g) || []).length;
-
-        const length = seq.length;
-        const gc = ((G + C) / length) * 100;
-        totalGC += gc;
-        totalLength += length;
-
-        let basicTmVal;
-        if (length < 14) {
-          basicTmVal = (A + T) * 2 + (G + C) * 4;
-        } else {
-          basicTmVal = 64.9 + 41 * (G + C - 16.4) / length;
-        }
-
-        if (basicTmVal < minTm) minTm = basicTmVal;
-        if (basicTmVal > maxTm) maxTm = basicTmVal;
-      }
-
-      const avgGC = totalGC / sequences.length;
-      const avgLength = totalLength / sequences.length;
-
-      document.getElementById('basicTm').innerText =
-        minTm === maxTm ? `Basic Tm: ${minTm.toFixed(2)} °C`
-                        : `Basic Tm Range: ${minTm.toFixed(2)} - ${maxTm.toFixed(2)} °C`;
-
-      document.getElementById('gcContent').innerText = `GC Content: ${avgGC.toFixed(2)}%`;
-      document.getElementById('primerLength').innerText = `Primer Length: ${avgLength.toFixed(0)} bp`;
-    }
-
-    function expandDegenerate(seq) {
-      const result = [''];
-      for (const base of seq) {
-        const options = degenerateMap[base];
-        if (!options) return [];
-        const temp = [];
-        for (const r of result) {
-          for (const opt of options) {
-            temp.push(r + opt);
-          }
-        }
-        result.splice(0, result.length, ...temp);
-        if (result.length > 1024) break; // prevent explosion
-      }
-      return result;
-    }
-
-    function swapStrands() {
-      const input = document.getElementById('sequence').value.toUpperCase().replace(/\s+/g, '');
-      let complement = '';
-      for (let i = input.length - 1; i >= 0; i--) {
-        const base = input[i];
-        complement += complementMap[base] || 'N';
-      }
-      document.getElementById('sequence').value = complement;
-    }
-  </script>
-</body>
-</html>
-
-
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Oligonucleotide Tm Calculator</title>
+<style>
+*{box-sizing:border-box}body{margin:0;color:#1c382e;background:#f3f5ee;font:15px/1.55 Inter,"Segoe UI",sans-serif}main{max-width:1120px;margin:auto;padding:clamp(20px,5vw,60px)}nav a{color:#476252;text-decoration:none}nav a:hover{text-decoration:underline}h1{font:500 clamp(36px,5vw,60px)/1.08 Georgia,serif;letter-spacing:-.045em;margin:24px 0}article{display:grid;grid-template-columns:1.35fr 1fr;gap:16px}section,form,details{border:1px solid #cad8ce;border-radius:15px;padding:clamp(18px,3vw,30px);background:#fff;min-width:0}h2,label{display:block;font:650 17px/1.4 Inter,"Segoe UI",sans-serif;margin:0 0 9px}label small{font-size:13px;color:#577161}textarea{width:100%;display:block;resize:vertical;min-height:130px;padding:14px;border:1px solid #acc3b4;border-radius:7px;background:#f8faf6;color:#143c2e;font:16px/1.55 ui-monospace,monospace;letter-spacing:.04em}.help,footer,details p{color:#506758;font-size:14px}.actions{display:flex;flex-wrap:wrap;gap:8px}button{font:600 14px system-ui;border:1px solid #235c48;border-radius:7px;background:#235c48;color:white;padding:11px 15px;cursor:pointer}button:hover{background:#164634}.secondary{background:white;color:#235c48}.secondary:hover{background:#edf4ed}:focus-visible{outline:3px solid #75a68c;outline-offset:3px}.results{background:#193c31;color:#fff}.results h2{font-size:15px;color:#d0e0cc}output{display:block;font-variant-numeric:tabular-nums}.temperature{font:500 clamp(32px,3vw,45px)/1.16 Georgia,serif;color:#e3efc4;overflow-wrap:anywhere;margin-bottom:24px}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:16px;border-top:1px solid #527060;padding-top:16px}.metrics span{font-size:13px;color:#cbdbcc}.metrics output{font-size:23px}.error{color:#a12f39;margin:10px 0 0}.error:empty{display:none}details{margin-top:16px;padding-block:15px}summary{font-weight:650;cursor:pointer}details p{margin:10px 0}footer{margin-top:25px;font-size:12px}@media(max-width:700px){article{grid-template-columns:1fr}}
+</style></head><body><main><nav><a href="AP-000-Main.html">← Back to Main</a></nav><h1>Oligonucleotide Tm Calculator</h1>
+<article><form id="form"><label for="sequence">DNA sequence <small>5′ → 3′</small></label><textarea id="sequence" placeholder="e.g. ATGCGTACGTA" spellcheck="false" autocapitalize="characters" aria-describedby="hint error"></textarea><p class="help" id="hint">Enter a DNA primer using standard or IUPAC mixed bases. Spaces and line breaks are ignored.</p><div class="actions"><button type="submit">Calculate basic Tm</button><button class="secondary" type="button" id="swap">Reverse complement</button></div><p class="error" id="error" role="alert"></p></form>
+<section class="results" aria-live="polite"><h2 id="tmLabel">Basic Tm</h2><output id="basicTm" class="temperature">—</output><div class="metrics"><div><span>Mean GC content</span><output id="gcContent">—</output></div><div><span>Primer length</span><output id="primerLength">—</output></div></div></section></article>
+<details><summary>Calculation method</summary><p>Below 14 bases: Tm = 2(A + T) + 4(G + C). From 14 bases: Tm = 64.9 + 41(G + C − 16.4) / length. Letters in the formulas represent base counts.</p><p>For mixed bases, the temperature range uses the lowest and highest possible GC counts. Mean GC content assumes equal proportions of the allowed bases at each position.</p></details><footer>Copyright 2025–2026. Jun Sei-Yong. All rights reserved.</footer></main>
+<script>
+const choices={A:'A',T:'T',G:'G',C:'C',R:'AG',Y:'CT',S:'GC',W:'AT',K:'GT',M:'AC',B:'CGT',D:'AGT',H:'ACT',V:'ACG',N:'ATGC'};
+const complements={A:'T',T:'A',G:'C',C:'G',R:'Y',Y:'R',S:'S',W:'W',K:'M',M:'K',B:'V',D:'H',H:'D',V:'B',N:'N'};
+const $=id=>document.getElementById(id);
+function estimates(seq){
+ let low=0,high=0,mean=0;
+ for(const base of seq){
+  const options=choices[base],gc=[...options].filter(b=>b==='C'||b==='G').length;
+  low+=Number(gc===options.length);high+=Number(gc>0);mean+=gc/options.length;
+ }
+ const n=seq.length;
+ const tm=gc=>n<14?2*(n-gc)+4*gc:64.9+41*(gc-16.4)/n;
+ return {min:tm(low),max:tm(high),percent:100*mean/n,n};
+}
+function reset(){
+ for(const id of ['basicTm','gcContent','primerLength'])$(id).textContent='—';
+ $('tmLabel').textContent='Basic Tm';$('error').textContent='';
+}
+function input(){
+ const seq=$('sequence').value.toUpperCase().replace(/\s+/g,'');
+ if(!seq||![...seq].every(base=>Object.hasOwn(choices,base))){
+  reset();$('error').textContent=seq?'Use DNA or IUPAC mixed-base symbols only.':'Enter a DNA sequence first.';return '';
+ }
+ return seq;
+}
+function show(seq){
+ const {min,max,percent,n}=estimates(seq);
+ $('tmLabel').textContent=min===max?'Basic Tm':'Basic Tm range';
+ $('basicTm').textContent=(min===max?min.toFixed(2):min.toFixed(2)+' – '+max.toFixed(2))+' °C';
+ $('gcContent').textContent=percent.toFixed(2)+'%';$('primerLength').textContent=n+' nt';$('error').textContent='';
+}
+$('sequence').oninput=reset;
+$('form').onsubmit=e=>{e.preventDefault();const seq=input();if(seq)show(seq)};
+$('swap').onclick=()=>{const seq=input();if(seq){const rc=[...seq].reverse().map(b=>complements[b]).join('');$('sequence').value=rc;show(rc)}};
+</script></body></html>
