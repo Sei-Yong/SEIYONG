@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Surface Patch Analyzer</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f6f5;color:#183730;font:15px/1.55 "Inter","Malgun Gothic",sans-serif}main{max-width:1080px;margin:auto;padding:clamp(20px,5vw,64px) 20px}h1{font-size:clamp(28px,5vw,43px);line-height:1.2;letter-spacing:-.05em;margin:0}header p{color:#49665e;margin:10px 0 28px}section,details{background:white;border:1px solid #cadad4;border-radius:12px;padding:20px;margin:14px 0}form{display:flex;align-items:center;gap:14px;flex-wrap:wrap}label,h2,summary{font-weight:700}h2{font-size:18px;margin:0 0 14px}input{max-width:100%;min-width:0}button,input::file-selector-button{padding:8px 15px;border-radius:6px;border:1px solid #b1c7bf;background:#f5faf7;color:#203e34;font:inherit;cursor:pointer}button{background:#186953;color:white;border-color:#186953;margin-left:auto;font-weight:650}button:disabled{opacity:.5;cursor:default}#status{font-size:14px;color:#42675c;margin:12px 0 0}.scroll{overflow:auto;max-height:62vh}table{width:100%;border-collapse:separate;border-spacing:0;white-space:nowrap;font-variant-numeric:tabular-nums}th,td{padding:9px 12px;border-bottom:1px solid #e2eae6;text-align:right}th{position:sticky;top:0;color:#3c5e52;background:#ecf4ef;font-size:13px}th:nth-child(-n+3),td:nth-child(-n+3){text-align:left}summary{cursor:pointer}details p{margin:10px 0 0}#status:empty{display:none}
+.settings{display:flex;flex-wrap:wrap;align-items:end;gap:14px}.settings label{display:grid;gap:4px;font-size:14px}.settings input,.settings select{font:inherit;padding:7px;border:1px solid #a9beb5;border-radius:6px}.settings input[type=number]{width:6em}#ranges{width:min(340px,74vw)}.hint{color:#476357;font-size:14px}.settings [hidden]{display:none}.subhead{font-size:15px;margin:16px 0 6px}#recommendation .scroll{max-height:36vh}
+body{background:#f3f5ef;color:#1c392f;font-family:Inter,"Segoe UI","Malgun Gothic",sans-serif}
+main{max-width:1100px;padding:clamp(16px,4vw,50px)}
+nav a{color:#45634f;text-decoration:none}nav a:hover{text-decoration:underline}
+header{background:#193d32;color:#fbfff6;border-radius:16px;padding:clamp(23px,4vw,40px);margin:20px 0 16px}
+h1{font:500 clamp(36px,5vw,57px)/1.06 Georgia,serif;letter-spacing:-.045em}
+header p{color:#d7e7d8;margin:12px 0 0}
+section,details{border:1px solid #cddbd0;border-radius:15px;padding:clamp(16px,3vw,28px);margin:0 0 16px}
+h2,form label{font-size:20px;letter-spacing:-.035em}
+form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center}
+form label{grid-column:1/-1}
+input[type=file]{width:100%;padding:6px;border:1px solid #afc3b5;border-radius:8px;background:#f8faf6;font:inherit}
+input::file-selector-button{margin-right:12px;padding:5px 12px;background:#e6eee6}
+button{border-radius:7px;padding:10px 18px;background:#215e48;border-color:#215e48}
+button:enabled:hover{background:#193d32}
+.settings{display:grid;grid-template-columns:auto minmax(0,1fr) auto;padding:16px;border-radius:9px;background:#f4f7f2}
+.settings input,.settings select{color:#193d32;background:white;padding:9px;border-color:#afc3b5}
+#ranges{width:100%}.hint,details p{color:#496455}
+.scroll{border:1px solid #d5e1d7;border-radius:8px}
+th{background:#e6eee6;color:#345541}tbody tr:nth-child(even){background:#f8faf6}
+tbody tr:hover{background:#eff6e7}
+:focus-visible{outline:3px solid #83a990;outline-offset:2px}
+footer{font-size:13px;color:#526b59}
+@media(max-width:650px){form,.settings{grid-template-columns:1fr}button,.settings input[type=number]{width:100%}}
+td:last-child{white-space:normal;text-align:left;min-width:14em}th:last-child{text-align:left}.patch-options{grid-column:1/-1;display:flex;align-items:center;gap:12px;flex-wrap:wrap}.patch-options label{font-size:15px}.patch-options select{padding:8px;color:#193d32;background:#f8faf6;border:1px solid #afc3b5;border-radius:7px;font:inherit}#hisOption[hidden]{display:none}</style>
+<main><nav><a href="AP-000-Main.html">← Back to Main</a></nav><header><h1>Surface Patch Analyzer</h1><p>Locate hydrophobic and positive charge patches on a protein surface.</p></header>
+<section><form id="form"><label for="file">Structure file (PDB or mmCIF)</label><input id="file" type="file" accept=".pdb,.ent,.cif,.mmcif" required><div class="patch-options"><label for="mode">Patch type</label><select id="mode"><option value="hydrophobic">Hydrophobic</option><option value="positive">Positive charge</option></select><label id="hisOption" hidden><input type="checkbox" id="his"> Include His as potentially protonated</label></div><button id="run">Find patches</button></form><p role="status" id="status"></p></section>
+<section id="output" hidden><h2 id="resultTitle">Surface patches</h2><p id="legend">Ranked by exposed side-chain carbon and sulfur area. Residue labels use the input structure’s chain and numbering.</p><div class="scroll"><table><thead><tr><th>Patch</th><th>Area (Å²)</th><th>Residues</th><th>Members (chain / residue)</th></tr></thead><tbody id="rows"></tbody></table></div></section>
+<details><summary>Method and interpretation</summary><p><strong>Hydrophobic mode.</strong> This static-structure screen considers Ala, Val, Ile, Leu, Met, Phe, Trp and Tyr. For each residue it sums solvent-accessible areas of side-chain carbon and sulfur atoms. A residue must contribute at least 10 Å².</p><p>Two qualifying residues are linked if any pair of their exposed side-chain carbon or sulfur atom centers is within 5 Å. A patch is a connected group of at least two residues. Its area is the sum over all member residues. A chain of contacts can span more than 5 Å.</p><p><strong>Positive charge mode.</strong> Apply the same 10 Å² per-residue and 5 Å interatomic cutoffs to exposed basic-group nitrogens: Lys NZ and Arg NE/NH1/NH2. Optionally include His ND1/NE2 as potentially protonated. Rank connected groups by summed nitrogen SASA. This geometric screen omits terminal charges, acidic countercharges, salt screening and pH-dependent ionization; it does not compute net charge or electrostatic potential.</p><p>All input chains are analyzed together, including contacts between chains. The first model’s ATOM records are used. HETATM records (including glycans and ligands) are omitted. Missing atoms or binding partners can change apparent exposure. SASA uses 20 Lee–Richards slices and a 1.4 Å probe.</p><p>The cutoffs are screening choices. Patch area is not a calibrated aggregation probability or a published SAP score. For background see Chennamsetty et al., PNAS (2009), doi:10.1073/pnas.0904191106.</p></details>
+<footer>© 2025–2026 Sei-Yong Jun. All rights reserved.</footer></main><script>
+'use strict';
+const radii={"ALA":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"OXT":1.46},"ARG":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.88,"CD":1.88,"NE":1.64,"CZ":1.61,"NH1":1.64,"NH2":1.64,"OXT":1.46},"ASN":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.61,"OD1":1.42,"ND2":1.64,"OXT":1.46},"ASP":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.61,"OD1":1.42,"OD2":1.46,"OXT":1.46},"CYS":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"SG":1.77,"OXT":1.46},"GLN":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.88,"CD":1.61,"OE1":1.42,"NE2":1.64,"OXT":1.46},"GLU":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.88,"CD":1.61,"OE1":1.42,"OE2":1.46,"OXT":1.46},"GLY":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"OXT":1.46},"HIS":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.61,"ND1":1.64,"CD2":1.76,"CE1":1.76,"NE2":1.64,"OXT":1.46},"ILE":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG1":1.88,"CG2":1.88,"CD1":1.88,"OXT":1.46},"LEU":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.88,"CD1":1.88,"CD2":1.88,"OXT":1.46},"LYS":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.88,"CD":1.88,"CE":1.88,"NZ":1.64,"OXT":1.46},"MET":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.88,"SD":1.77,"CE":1.88,"OXT":1.46},"PHE":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.61,"CD1":1.76,"CD2":1.76,"CE1":1.76,"CE2":1.76,"CZ":1.76,"OXT":1.46},"PRO":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.88,"CD":1.88,"OXT":1.46},"SER":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"OG":1.46,"OXT":1.46},"THR":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"OG1":1.46,"CG2":1.88,"OXT":1.46},"TRP":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.61,"CD1":1.76,"CD2":1.61,"NE1":1.64,"CE2":1.61,"CE3":1.76,"CZ2":1.76,"CZ3":1.76,"CH2":1.76,"OXT":1.46},"TYR":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.61,"CD1":1.76,"CD2":1.76,"CE1":1.76,"CE2":1.76,"CZ":1.61,"OH":1.46,"OXT":1.46},"VAL":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG1":1.88,"CG2":1.88,"OXT":1.46},"ASX":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.61,"XD1":1.5,"XD2":1.5,"OXT":1.46},"GLX":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"CB":1.88,"CG":1.88,"CD":1.61,"XE1":1.5,"XE2":1.5,"OXT":1.46},"PYL":{"CB2":1.88,"CG2":1.88,"CD2":1.88,"CE2":1.76,"N2":1.64,"CA2":1.88,"C2":1.61,"O2":1.42,"NZ":1.64,"CE":1.88,"CD":1.88,"CG":1.88,"CB":1.88,"CA":1.88,"C":1.61,"OXT":1.46,"O":1.42,"N":1.64},"SEC":{"N":1.64,"CA":1.88,"CB":1.88,"SE":1.9,"C":1.61,"O":1.42,"OXT":1.46},"MSE":{"N":1.64,"CA":1.88,"C":1.61,"O":1.42,"OXT":1.46,"CB":1.88,"CG":1.88,"SE":1.9,"CE":1.88},"HOH":{"O":1.46},"NH2":{"N":1.64},"ACE":{"C":1.76,"O":1.42,"CH3":1.88},"A":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"O2'":1.46,"C1'":1.88,"N9":1.64,"C8":1.76,"N7":1.64,"C5":1.61,"C6":1.61,"N6":1.64,"N1":1.64,"C2":1.76,"N3":1.64,"C4":1.61},"C":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"O2'":1.46,"C1'":1.88,"N1":1.64,"C2":1.61,"O2":1.42,"N3":1.64,"C4":1.61,"N4":1.64,"C5":1.76,"C6":1.76},"G":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"O2'":1.46,"C1'":1.88,"N9":1.64,"C8":1.76,"N7":1.64,"C5":1.61,"C6":1.61,"O6":1.42,"N1":1.64,"C2":1.61,"N2":1.64,"N3":1.64,"C4":1.61},"I":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"O2'":1.46,"C1'":1.88,"N9":1.64,"C8":1.76,"N7":1.64,"C5":1.61,"C6":1.61,"O6":1.42,"N1":1.64,"C2":1.76,"N3":1.64,"C4":1.61},"T":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"C1'":1.88,"N1":1.64,"C2":1.61,"O2":1.42,"N3":1.64,"C4":1.61,"O4":1.42,"C5":1.61,"C7":1.88,"C6":1.76},"U":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"O2'":1.46,"C1'":1.88,"N1":1.64,"C2":1.61,"O2":1.42,"N3":1.64,"C4":1.61,"O4":1.42,"C5":1.76,"C6":1.76},"DA":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"C1'":1.88,"N9":1.64,"C8":1.76,"N7":1.64,"C5":1.61,"C6":1.61,"N6":1.64,"N1":1.64,"C2":1.76,"N3":1.64,"C4":1.61},"DC":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"C1'":1.88,"N1":1.64,"C2":1.61,"O2":1.42,"N3":1.64,"C4":1.61,"N4":1.64,"C5":1.76,"C6":1.76},"DG":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"C1'":1.88,"N9":1.64,"C8":1.76,"N7":1.64,"C5":1.61,"C6":1.61,"O6":1.42,"N1":1.64,"C2":1.61,"N2":1.64,"N3":1.64,"C4":1.61},"DI":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"C1'":1.88,"N9":1.64,"C8":1.76,"N7":1.64,"C5":1.61,"C6":1.61,"O6":1.42,"N1":1.64,"C2":1.76,"N3":1.64,"C4":1.61},"DT":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"C1'":1.88,"N1":1.64,"C2":1.61,"O2":1.42,"N3":1.64,"C4":1.61,"O4":1.42,"C5":1.61,"C7":1.88,"C6":1.76},"DU":{"OP3":1.46,"P":1.8,"OP1":1.42,"OP2":1.46,"O5'":1.46,"C5'":1.88,"C4'":1.88,"O4'":1.46,"C3'":1.88,"O3'":1.46,"C2'":1.88,"C1'":1.88,"N1":1.64,"C2":1.61,"O2":1.42,"N3":1.64,"C4":1.61,"O4":1.42,"C5":1.76,"C6":1.76}};
+const maxima={ALA:121,ARG:265,ASN:187,ASP:187,CYS:148,GLN:214,GLU:214,GLY:97,HIS:216,ILE:195,LEU:191,LYS:230,MET:203,PHE:228,PRO:154,SER:143,THR:163,TRP:264,TYR:255,VAL:165};
+const backbone=new Set(['N','CA','C','O','OXT','H','HA']);
+const probe=1.4, slices=20, tau=2*Math.PI;
+function* pdbRecords(text){
+ for(const line of text.split(/\r?\n/)){
+  const tag=line.slice(0,6).trim();
+  if(tag==='ENDMDL'||tag==='END')break;
+  if(tag!=='ATOM')continue;
+  const name=line.slice(12,16).trim(),element=line.slice(76,78).trim()||name.replace(/^\d+/,'')[0];
+  const chain=line.slice(21,22).trim(),num=line.slice(22,26).trim(),ins=line.slice(26,27).trim(),res=line.slice(17,20).trim();
+  yield {name,element,chain,num,ins,res,alt:line.slice(16,17).trim(),coords:[30,38,46].map(i=>line.slice(i,i+8).trim())};
+ }
+}
+function* cifTokens(text){
+ const lines=text.split(/\r?\n/);
+ for(let i=0;i<lines.length;i++){
+  const line=lines[i];
+  if(line.startsWith(';')){
+   const block=[line.slice(1)];
+   while(++i<lines.length&&!lines[i].startsWith(';'))block.push(lines[i]);
+   if(i===lines.length)throw Error('Unterminated CIF text field.');
+   yield {value:block.join('\n'),literal:true};continue;
+  }
+  let j=0;
+  while(j<line.length){
+   if(/\s/.test(line[j])){j++;continue}
+   if(line[j]==='#')break;
+   const quote=line[j],literal=quote==="'"||quote==='"';
+   if(literal)j++;
+   const start=j;
+   if(literal){
+    while(j<line.length&&!(line[j]===quote&&(j+1===line.length||/\s/.test(line[j+1]))))j++;
+    if(j===line.length)throw Error('Unterminated quoted string in the CIF file.');
+   }else while(j<line.length&&!/\s/.test(line[j]))j++;
+   yield {value:line.slice(start,j),literal};
+   if(literal)j++;
+  }
+ }
+}
+function* cifRecords(text){
+ const stream=cifTokens(text);
+ let token=stream.next().value;
+ const next=()=>{token=stream.next().value};
+ const control=t=>!t.literal&&/^(?:_|loop_$|stop_$|data_|save_|global_$)/i.test(t.value);
+ while(token){
+  if(token.literal||token.value.toLowerCase()!=='loop_'){next();continue}
+  next();
+  const headers=[];
+  while(token&&!token.literal&&token.value.startsWith('_')){headers.push(token.value.toLowerCase());next()}
+  if(!headers.includes('_atom_site.cartn_x'))continue;
+  const columns=new Map(headers.map((h,i)=>[h,i]));
+  for(const col of ['group_pdb','cartn_x','cartn_y','cartn_z']){
+   if(!columns.has('_atom_site.'+col))throw Error('Missing mmCIF coordinate column: '+col);
+  }
+  let model;
+  while(token&&!control(token)){
+   const values=[];
+   for(let i=0;i<headers.length;i++){
+    if(!token||control(token))throw Error('An mmCIF atom row has the wrong number of columns.');
+    values.push(token.value);next();
+   }
+   function get(...names){
+    for(const name of names){
+     const v=values[columns.get('_atom_site.'+name)];
+     if(v!==undefined&&v!=='.'&&v!=='?')return v;
+    }
+    return '';
+   }
+   const current=get('pdbx_pdb_model_num')||'1';
+   if(model===undefined)model=current;
+   if(model!==current||get('group_pdb').toUpperCase()!=='ATOM')continue;
+   const name=get('auth_atom_id','label_atom_id'),res=get('auth_comp_id','label_comp_id');
+   const num=get('auth_seq_id','label_seq_id');
+   if(!name||!res||!num)throw Error('An mmCIF atom row is missing an atom name, residue name or residue number.');
+   yield {name,res,num,chain:get('auth_asym_id','label_asym_id'),ins:get('pdbx_pdb_ins_code'),alt:get('label_alt_id','auth_alt_id'),
+    element:get('type_symbol').toUpperCase()||name.replace(/^\d+/,'')[0],coords:['cartn_x','cartn_y','cartn_z'].map(col=>get(col))};
+  }
+  return;
+ }
+ throw Error('The mmCIF file has no _atom_site coordinate table.');
+}
+function parseStructure(text,filename){
+ const atoms=[],residues=new Map();
+ const isCif=/\.(?:mm)?cif$/i.test(filename||'')||/^\s*data_.*$/im.test(text);
+ for(const {name,element,chain,num,ins,res,alt,coords} of (isCif?cifRecords(text):pdbRecords(text))){
+  if(element==='H'||element==='D')continue;
+  const key=JSON.stringify([chain,num,ins]);
+  if(!residues.has(key))residues.set(key,{chain,num,ins,res,alt:'',names:new Set(),total:0,side:0});
+  const row=residues.get(key);
+  if(alt){if(!row.alt)row.alt=alt;if(alt!==row.alt)continue}
+  if(row.names.has(name))continue;
+  const radius=radii[res]?.[name];
+  if(!Number.isFinite(radius))throw Error(`Unknown atomic radius (${chain} ${res} ${num}${ins} ${name}).`);
+  if(coords.some(v=>v===''||!Number.isFinite(Number(v))))throw Error(`Invalid atomic coordinates (${chain} ${res} ${num}${ins} ${name}).`);
+  const [x,y,z]=coords.map(Number);
+  atoms.push({x,y,z,r:radius+probe,row,name});row.names.add(name);
+ }
+ if(!atoms.length)throw Error('No usable ATOM records were found in the first model. Check the structure file format.');
+ return {atoms,residues};
+}
+// A grid cell spans at least the largest possible diameter.
+function spatialGrid(atoms){
+ const width=2*atoms.reduce((r,a)=>Math.max(r,a.r),0), cells=new Map();
+ for(const a of atoms){
+  a.cell=[a.x,a.y,a.z].map(v=>Math.floor(v/width));
+  const key=a.cell.join(',');
+  if(!cells.has(key))cells.set(key,[]);cells.get(key).push(a);
+ }
+ return cells;
+}
+function neighbors(a,cells){
+ const hits=[],[i,j,k]=a.cell;
+ for(let x=i-1;x<=i+1;x++)for(let y=j-1;y<=j+1;y++)for(let z=k-1;z<=k+1;z++){
+  for(const b of cells.get([x,y,z].join(','))||[]){
+   if(a===b)continue;
+   const dx=b.x-a.x,dy=b.y-a.y,dz=b.z-a.z,d=Math.hypot(dx,dy);
+   if(d*d+dz*dz<(a.r+b.r)**2)hits.push({d,dz,angle:Math.atan2(dy,dx),r:b.r});
+  }
+ }
+ return hits;
+}
+function accessibleArea(a,near){
+ const step=2*a.r/slices;let exposed=0;
+ for(let s=0;s<slices;s++){
+  const z=-a.r+(s+.5)*step,r=Math.sqrt(a.r*a.r-z*z),arcs=[];
+  let covered=false;
+  for(const b of near){
+   const sq=b.r*b.r-(z-b.dz)**2;if(sq<=0)continue;
+   const q=Math.sqrt(sq);
+   if(b.d+r<=q){covered=true;break}
+   if(b.d>=r+q||b.d+q<=r||b.d===0)continue;
+   const cos=(b.d*b.d+r*r-sq)/(2*b.d*r),half=Math.acos(Math.max(-1,Math.min(1,cos)));
+   const start=(b.angle-half+tau)%tau,end=start+2*half;
+   arcs.push([start,Math.min(end,tau)]);if(end>tau)arcs.push([0,end-tau]);
+  }
+  if(covered)continue;
+  let last=0,open=0;
+  arcs.sort((a,b)=>a[0]-b[0]);
+  for(const [lo,hi] of arcs){open+=Math.max(0,lo-last);last=Math.max(last,hi)}
+  exposed+=open+(tau-last);
+ }
+ return exposed*a.r*step;
+}
+async function calculate(text,progress,filename){
+ const {atoms,residues}=parseStructure(text,filename),cells=spatialGrid(atoms);
+ let last=performance.now();
+ for(let i=0;i<atoms.length;i++){
+  const a=atoms[i],area=accessibleArea(a,neighbors(a,cells));
+  a.area=area;a.row.total+=area;if(!backbone.has(a.name))a.row.side+=area;
+  if(performance.now()-last>70){await progress(i+1,atoms.length);last=performance.now()}
+ }
+ return atoms;
+}
+
+function findPatches(atoms,mode,includeHis) {
+ const types = new Set('ALA VAL ILE LEU MET PHE TRP TYR'.split(' '));
+ const nitrogens={LYS:['NZ'],ARG:['NE','NH1','NH2']};
+ if(includeHis) nitrogens.HIS=['ND1','NE2'];
+ const surface=atoms.filter(a=>{
+   if(a.area<=0)return false;
+   if(mode==='positive')return nitrogens[a.row.res]?.includes(a.name);
+   return types.has(a.row.res) && !backbone.has(a.name) && /^[CS]/.test(a.name);
+ });
+ const areas = new Map();
+ for (const a of surface) areas.set(a.row,(areas.get(a.row)||0)+a.area);
+ const graph = new Map(), grid = new Map(), cutoff = 5;
+ for (const a of surface) {
+   if (areas.get(a.row)<10) continue;
+   if (!graph.has(a.row)) graph.set(a.row,new Set());
+   const [i,j,k]=[a.x,a.y,a.z].map(v=>Math.floor(v/cutoff));
+   for(let x=i-1;x<=i+1;x++) for(let y=j-1;y<=j+1;y++) for(let z=k-1;z<=k+1;z++){
+     for(const b of grid.get([x,y,z].join(','))||[]){
+       if(a.row!==b.row && Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z)<=cutoff){
+         graph.get(a.row).add(b.row); graph.get(b.row).add(a.row);
+       }
+     }
+   }
+   const key=[i,j,k].join(',');
+   if(!grid.has(key)) grid.set(key,[]);
+   grid.get(key).push(a);
+ }
+ const visited=new Set(), patches=[];
+ for(const seed of graph.keys()){
+   if(visited.has(seed)) continue;
+   const stack=[seed],members=[];
+   visited.add(seed);
+   while(stack.length){
+     const r=stack.pop(); members.push(r);
+     for(const n of graph.get(r)) if(!visited.has(n)){visited.add(n);stack.push(n)}
+   }
+   if(members.length>1){
+     members.sort((a,b)=>areas.get(b)-areas.get(a));
+     patches.push({members,area:members.reduce((total,r)=>total+areas.get(r),0)});
+   }
+ }
+ return patches.sort((a,b)=>b.area-a.area);
+}
+const id=k=>document.getElementById(k);
+let cached=null;
+function refresh(){
+ const positive=id('mode').value==='positive';
+ id('hisOption').hidden=!positive;
+ if(!cached)return;
+ const patches=findPatches(cached,id('mode').value,id('his').checked);
+ id('resultTitle').textContent=positive?'Positive charge patches':'Hydrophobic patches';
+ id('legend').textContent=positive?'Ranked by exposed basic-group nitrogen area (Å²).':'Ranked by exposed side-chain carbon and sulfur area (Å²).';
+ id('rows').replaceChildren();
+   for(const [i,p] of patches.entries()){
+     const tr=document.createElement('tr');
+     for(const value of [i+1,p.area.toFixed(1),p.members.length,p.members.map(r=>(r.chain||'—')+' / '+r.res+' '+r.num+r.ins).join(', ')]){
+       const td=document.createElement('td');td.textContent=value;tr.append(td);
+     }
+     id('rows').append(tr);
+   }
+   id('output').hidden=!patches.length;
+   id('status').textContent=id('file').files[0].name+' · '+(patches.length?patches.length+' surface patches':'No clusters meet the screening criteria.');
+
+}
+id('mode').onchange=id('his').onchange=refresh;
+id('file').onchange=()=>{cached=null;id('output').hidden=true;id('status').textContent=''};
+id('form').onsubmit=async event=>{
+ event.preventDefault();
+ const file=id('file').files[0];if(!file)return;
+ id('output').hidden=true;id('run').disabled=id('file').disabled=true;
+ id('status').textContent='Reading structure…';
+ try{
+   if(!cached)cached=await calculate(await file.text(),async(done,total)=>{
+     id('status').textContent='Calculating surface area · '+Math.round(100*done/total)+'%';
+     await new Promise(resolve=>setTimeout(resolve,0));
+   },file.name);
+   refresh();
+ }catch(e){id('status').textContent=e.message}
+ finally{id('file').disabled=id('run').disabled=false}
+};
+</script></body></html>
