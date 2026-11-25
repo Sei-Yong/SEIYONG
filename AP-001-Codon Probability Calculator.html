@@ -1,132 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Codon to Amino Acid Probability Calculator</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      margin: 0;
-      padding: 40px;
-    }
-    .container {
-      max-width: 1000px;
-      margin: auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    h2 {
-      font-size: 26px;
-      margin-bottom: 25px;
-	  text-align: center;
-    }
-    .tables {
-      display: flex;
-      gap: 40px;
-      justify-content: center;
-      margin-bottom: 30px;
-    }
-    .codon-box, .degenerate-box {
-      flex: 1;
-      text-align: center;
-    }
-    .codon-box h3, .degenerate-box h3 {
-      font-size: 20px;
-      margin-bottom: 10px;
-    }
-    table {
-      border-collapse: collapse;
-      margin: auto;
-      font-size: 16px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 6px 10px;
-      text-align: center;
-    }
-    .codon-table th[colspan] {
-      background: #f2f2f2;
-    }
-	.codon-table th[rowspan] {
-	  background: #f2f2f2;
-	}
-    .form-section {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 20px;
-    }
-    .input-section, .spiked-table-section {
-      flex: 1;
-      margin-right: 20px;
-    }
-    .input-section input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      margin-top: 5px;
-      margin-bottom: 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    .spiked-table-section table {
-      width: auto;
-    }
-    button {
-      width: 200px;
-      padding: 10px;
-      font-size: 16px;
-      background-color: #007acc;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      display: block;
-      margin: 0 auto 20px auto;
-    }
-    button:hover {
-      background-color: #005fa3;
-    }
-    .result {
-      margin-top: 20px;
-      padding: 15px;
-      background: #e8f5e9;
-      border-radius: 8px;
-      white-space: pre-wrap;
-      font-family: monospace;
-    }
-    .stop {
-      color: red;
-    }
-	    footer {
-      text-align: center;
-      margin-top: 40px;
-      color: #666;
-      font-size: 14px;
-    }
-    footer img {
-      height: 50px;
-      margin-bottom: 10px;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h2>Codon to Amino Acid Probability Calculator</h2>
-
-    <div class="tables">
-      <div class="codon-box">
-        <h3>Codon Table</h3>
-        <table class="codon-table">
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Codon to Amino Acid Probability Calculator</title><style>
+*{box-sizing:border-box}body{margin:0;background:#f3f5ef;color:#1d382f;font:15px/1.55 Inter,"Segoe UI",sans-serif}main{width:min(1120px,100%);margin:auto;padding:clamp(18px,4vw,50px)}nav a{color:#426351;text-decoration:none}nav a:hover{text-decoration:underline}header{margin:22px 0 26px}h1{font:500 clamp(33px,5vw,58px)/1.07 Georgia,serif;letter-spacing:-.045em;margin:0}h2,summary{font-size:18px;font-weight:650;margin:0 0 12px}.work,.refs{display:grid;gap:16px;align-items:start}.work{grid-template-columns:1.12fr 1fr}.refs{grid-template-columns:1.65fr 1fr;margin-top:16px}section,details{border:1px solid #cdd9ce;border-radius:15px;padding:clamp(16px,2.5vw,27px);background:white;min-width:0}.entry{background:#193e33;color:white;border-color:#193e33}form label{font-size:20px;font-weight:600}p{color:#52695b;font-size:14px;margin:4px 0 15px}.entry p{color:#d1e2d6}.controls{display:flex;gap:8px;flex-wrap:wrap}input,button{font:inherit;border-radius:6px}input[type=text]{min-width:0;flex:1 1 130px;padding:11px 14px;border:1px solid #759c87;background:#fbfdf8;color:#1d382f;font:18px ui-monospace,monospace}button{background:#cfdfa4;color:#203b2d;font-weight:700;border:0;padding:10px 18px;cursor:pointer}button:hover{background:#e4edc7}input:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #91b888;outline-offset:2px}.result{font:14px/1.6 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere;margin:18px 0 0;border-top:1px solid #557669;padding-top:14px}.result:empty{display:none}.stop{color:#ffb7b3}.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;font:14px/1.35 ui-monospace,monospace;font-variant-numeric:tabular-nums}th,td{text-align:center;padding:7px;border-bottom:1px solid #dce6dd}th{background:#edf3ea;color:#315740}.codon-table th[rowspan]{color:#1d523a}.stop-cell{color:#973e46;background:#fff0ef}input[type=number]{width:100%;min-width:35px;border:1px solid #b4c7b8;background:#f8faf5;text-align:center;padding:6px 2px;color:#193e33}.mix td{padding:4px}.mix table{table-layout:fixed}.mix th:first-child{width:48px}summary{cursor:pointer;color:#274936;margin:0}details[open] summary{margin-bottom:16px}footer{margin-top:24px;font-size:12px;color:#627367}@media(max-width:740px){.work,.refs{grid-template-columns:minmax(0,1fr)}.codon-table{min-width:520px}}
+</style></head><body><main><nav><a href="AP-000-Main.html">← Back to Main</a></nav><header><h1>Codon to amino acid<br>probability calculator</h1></header>
+<div class="work"><section class="entry"><form onsubmit="event.preventDefault();calculateCodon()"><label for="codonInput">Input codon</label><p>Enter three bases. Use uppercase for standard or degenerate bases and lowercase a, t, g or c for a spiked base.</p><div class="controls"><input id="codonInput" type="text" placeholder="ATC, ATc or NNK" autocomplete="off" autocapitalize="off" spellcheck="false"><button type="submit">Calculate</button></div></form><div class="result" id="result" role="status" aria-live="polite"></div></section>
+<section class="mix"><h2>Spiked oligo probabilities</h2><p>Enter the base mixture (%) for each lowercase input.</p><table>
+          <thead>
+            <tr>
+              <th>Base</th><th>A</th><th>T</th><th>G</th><th>C</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>a</td><td><input type="number" id="A_A" aria-label="Spiked a to A percent" value="70"></td><td><input type="number" id="A_T" aria-label="Spiked a to T percent" value="10"></td><td><input type="number" id="A_G" aria-label="Spiked a to G percent" value="10"></td><td><input type="number" id="A_C" aria-label="Spiked a to C percent" value="10"></td></tr>
+            <tr><td>t</td><td><input type="number" id="T_A" aria-label="Spiked t to A percent" value="10"></td><td><input type="number" id="T_T" aria-label="Spiked t to T percent" value="70"></td><td><input type="number" id="T_G" aria-label="Spiked t to G percent" value="10"></td><td><input type="number" id="T_C" aria-label="Spiked t to C percent" value="10"></td></tr>
+            <tr><td>g</td><td><input type="number" id="G_A" aria-label="Spiked g to A percent" value="10"></td><td><input type="number" id="G_T" aria-label="Spiked g to T percent" value="10"></td><td><input type="number" id="G_G" aria-label="Spiked g to G percent" value="70"></td><td><input type="number" id="G_C" aria-label="Spiked g to C percent" value="10"></td></tr>
+            <tr><td>c</td><td><input type="number" id="C_A" aria-label="Spiked c to A percent" value="10"></td><td><input type="number" id="C_T" aria-label="Spiked c to T percent" value="10"></td><td><input type="number" id="C_G" aria-label="Spiked c to G percent" value="10"></td><td><input type="number" id="C_C" aria-label="Spiked c to C percent" value="70"></td></tr>
+          </tbody>
+        </table></section></div><div class="refs"><details open><summary>Codon table</summary><div class="scroll"><table class="codon-table">
           <tr><th rowspan="2"></th><th colspan="2">T</th><th colspan="2">C</th><th colspan="2">A</th><th colspan="2">G</th></tr>
-          <tr style="background :#f2f2f2;"><th>Triplet</th><th>AA</th><th>Triplet</th><th>AA</th><th>Triplet</th><th>AA</th><th>Triplet</th><th>AA</th></tr>
+          <tr><th>Triplet</th><th>AA</th><th>Triplet</th><th>AA</th><th>Triplet</th><th>AA</th><th>Triplet</th><th>AA</th></tr>
           <tr><th rowspan="4">T</th><td>TTT</td><td>F</td><td>TCT</td><td>S</td><td>TAT</td><td>Y</td><td>TGT</td><td>C</td></tr>
           <tr><td>TTC</td><td>F</td><td>TCC</td><td>S</td><td>TAC</td><td>Y</td><td>TGC</td><td>C</td></tr>
-          <tr><td>TTA</td><td>L</td><td>TCA</td><td>S</td><td>TAA</td><td style="background: #ffe6e6;">*(Ochre)</td><td>TGA</td><td style="background: #ffe6e6;">*(Opal)</td></tr>
-          <tr><td>TTG</td><td>L</td><td>TCG</td><td>S</td><td>TAG</td><td style="background: #ffe6e6;">*(Amber)</td><td>TGG</td><td>W</td></tr>
+          <tr><td>TTA</td><td>L</td><td>TCA</td><td>S</td><td>TAA</td><td class="stop-cell">*(Ochre)</td><td>TGA</td><td class="stop-cell">*(Opal)</td></tr>
+          <tr><td>TTG</td><td>L</td><td>TCG</td><td>S</td><td>TAG</td><td class="stop-cell">*(Amber)</td><td>TGG</td><td>W</td></tr>
           <tr><th rowspan="4">C</th><td>CTT</td><td>L</td><td>CCT</td><td>P</td><td>CAT</td><td>H</td><td>CGT</td><td>R</td></tr>
           <tr><td>CTC</td><td>L</td><td>CCC</td><td>P</td><td>CAC</td><td>H</td><td>CGC</td><td>R</td></tr>
           <tr><td>CTA</td><td>L</td><td>CCA</td><td>P</td><td>CAA</td><td>Q</td><td>CGA</td><td>R</td></tr>
@@ -139,67 +33,20 @@
           <tr><td>GTC</td><td>V</td><td>GCC</td><td>A</td><td>GAC</td><td>D</td><td>GGC</td><td>G</td></tr>
           <tr><td>GTA</td><td>V</td><td>GCA</td><td>A</td><td>GAA</td><td>E</td><td>GGA</td><td>G</td></tr>
           <tr><td>GTG</td><td>V</td><td>GCG</td><td>A</td><td>GAG</td><td>E</td><td>GGG</td><td>G</td></tr>
-        </table>
-      </div>
-
-      <div class="degenerate-box">
-        <h3>Degenerate Codon Table</h3>
-        <table>
-          <tr style="background: #f2f2f2;"><th>Symbol</th><th>Represents</th></tr>
-          <tr><td style="background :#f2f2f2;">R</td><td>A or G</td></tr>
-          <tr><td style="background :#f2f2f2;">Y</td><td>C or T</td></tr>
-          <tr><td style="background :#f2f2f2;">S</td><td>G or C</td></tr>
-          <tr><td style="background :#f2f2f2;">W</td><td>A or T</td></tr>
-          <tr><td style="background :#f2f2f2;">K</td><td>G or T</td></tr>
-          <tr><td style="background :#f2f2f2;">M</td><td>A or C</td></tr>
-          <tr><td style="background :#f2f2f2;">B</td><td>C or G or T</td></tr>
-          <tr><td style="background :#f2f2f2;">D</td><td>A or G or T</td></tr>
-          <tr><td style="background :#f2f2f2;">H</td><td>A or C or T</td></tr>
-          <tr><td style="background :#f2f2f2;">V</td><td>A or C or G</td></tr>
-          <tr><td style="background :#f2f2f2;">N</td><td>A or C or G or T</td></tr>
-        </table>
-      </div>
-    </div>
-
-    <div class="form-section">
-      <div class="spiked-table-section">
-        <h3>Spiked Oligo Probability Table (Enter %)</h3>
-        <table>
-          <thead>
-            <tr style="background: #f2f2f2;">
-              <th>Base</th><th>A</th><th>T</th><th>G</th><th>C</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td style="background :#f2f2f2;">a</td><td><input type="number" id="A_A" value="70"></td><td><input type="number" id="A_T" value="10"></td><td><input type="number" id="A_G" value="10"></td><td><input type="number" id="A_C" value="10"></td></tr>
-            <tr><td style="background :#f2f2f2;">t</td><td><input type="number" id="T_A" value="10"></td><td><input type="number" id="T_T" value="70"></td><td><input type="number" id="T_G" value="10"></td><td><input type="number" id="T_C" value="10"></td></tr>
-            <tr><td style="background :#f2f2f2;">g</td><td><input type="number" id="G_A" value="10"></td><td><input type="number" id="G_T" value="10"></td><td><input type="number" id="G_G" value="70"></td><td><input type="number" id="G_C" value="10"></td></tr>
-            <tr><td style="background :#f2f2f2;">c</td><td><input type="number" id="C_A" value="10"></td><td><input type="number" id="C_T" value="10"></td><td><input type="number" id="C_G" value="10"></td><td><input type="number" id="C_C" value="70"></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="input-section">
-      <label for="codonInput"><strong>Enter codon (ATC or ATc (c for spiked oligonucleotide) or NNK)</strong></label>
-      <input type="text" id="codonInput" placeholder="e.g. ATC or ATc or NNK">
-    </div>
-
-    <button onclick="calculateCodon()">Calculate</button>
-    <div id="result" class="result"></div>
-    <div style="text-align: center; margin-top: 30px;">
-  <a href="AP-000-Main.html" style="font-size: 16px; color: #007acc; text-decoration: none;">&larr; Back to Main</a>
-  </div>
-  
-  </div>
-  
-  
-    <footer>
-    <div>Copyright 2025-2026. Jun Sei-Yong All rights reserved.</div>
-  </footer>
-
-  
-  <script>
+        </table></div></details><details open><summary>Degenerate codon table</summary><table>
+          <tr><th>Symbol</th><th>Represents</th></tr>
+          <tr><td>R</td><td>A or G</td></tr>
+          <tr><td>Y</td><td>C or T</td></tr>
+          <tr><td>S</td><td>G or C</td></tr>
+          <tr><td>W</td><td>A or T</td></tr>
+          <tr><td>K</td><td>G or T</td></tr>
+          <tr><td>M</td><td>A or C</td></tr>
+          <tr><td>B</td><td>C or G or T</td></tr>
+          <tr><td>D</td><td>A or G or T</td></tr>
+          <tr><td>H</td><td>A or C or T</td></tr>
+          <tr><td>V</td><td>A or C or G</td></tr>
+          <tr><td>N</td><td>A or C or G or T</td></tr>
+        </table></details></div><footer>Copyright 2025–2026. Jun Sei-Yong. All rights reserved.</footer></main><script>
     const staticBaseProbabilities = {
       A: {'A': 1.0}, T: {'T': 1.0}, G: {'G': 1.0}, C: {'C': 1.0},
       N: {'A': 0.25, 'C': 0.25, 'T': 0.25, 'G': 0.25},
@@ -293,7 +140,4 @@
       }
       resultDiv.innerHTML = output;
     }
-  </script>
-</body>
-</html>
-
+  </script></body></html>
