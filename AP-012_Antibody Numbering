@@ -1,0 +1,99 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>항체 서열 넘버링</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f2f6f5;color:#183a34;font:15px/1.55 system-ui,sans-serif}main{max-width:960px;margin:auto;padding:40px 20px}h1{margin:0;font-size:34px}h2{font-size:19px;margin:0 0 12px}section{background:white;border:1px solid #ceddd7;border-radius:12px;padding:22px;margin:18px 0}textarea{width:100%;height:120px;font:15px/1.65 monospace}select,textarea,button{padding:9px;border:1px solid #a4bdb2;border-radius:5px}button{background:#196751;color:white;cursor:pointer}label{display:grid;gap:5px;font-weight:600}.options{display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin-top:14px}p{color:#45675d}table{width:100%;border-collapse:collapse;text-align:left}td,th{padding:7px 10px;border-bottom:1px solid #e0eae5}th{position:sticky;top:0;background:#e8f2eb}.scroll{overflow:auto;max-height:60vh}tr.cdr{background:#f0f8f4}[hidden]{display:none}#status{white-space:pre-wrap}
+</style>
+<main><h1>항체 서열 넘버링</h1><p>VH 또는 VL 서열의 잔기 번호, FR/CDR 영역과 Packing·Vernier 위치를 확인합니다.</p>
+<section><label>아미노산 서열 또는 단일 FASTA<textarea id="seq" spellcheck="false" autocomplete="off"></textarea></label>
+<div class="options"><label>표시 번호 체계<select id="scheme"><option>IMGT</option><option>Kabat</option><option>Chothia</option><option>Martin</option><option>AHo</option></select></label>
+<label>주석 목록의 원래 번호 체계<select id="basis"><option>Kabat</option><option>IMGT</option><option>Chothia</option><option>Martin</option><option>AHo</option></select></label>
+<button id="run">서열 분석</button><button id="save" hidden>오프라인 HTML 저장</button></div>
+<p id="help">첫 분석에는 계산 엔진 다운로드를 위한 인터넷 연결이 필요합니다. 이후 ‘오프라인 HTML 저장’을 누르면 엔진을 포함한 빈 도구를 저장합니다.</p>
+<p role="status" id="status"></p></section><section id="panel" hidden><h2 id="heading"></h2><div class="scroll"><table><thead><tr><th>서열 위치</th><th>표시 번호</th><th>잔기</th><th>영역</th><th>주석 기준 번호</th><th>비고</th></tr></thead><tbody id="rows"></tbody></table></div></section></main>
+<script type="application/json" id="bundle">null</script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const initialHTML='<!doctype html>'+document.documentElement.outerHTML;
+const packing=new Set('L2 L21 L23 L38 L44 L58 L62 L73 L75 L78 L82 L86 L87 L88 L99 L101 L102 L104 L106 H4 H6 H9 H20 H22 H24 H36 H37 H38 H39 H45 H80 H82 H82C H86 H90 H91 H92 H104 H106 H109 H111'.split(' '));
+const vernier=new Set('L4 L6 L35 L36 L46 L47 L48 L49 L64 L66 L68 L69 L98 H2 H27 H28 H29 H30 H47 H48 H49 H67 H69 H71 H73 H78 H93 H94 H103'.split(' '));
+const base='https://cdn.jsdelivr.net/npm/immunum@2.1.0/';
+let engine=null,assets=JSON.parse($('bundle').textContent);
+if(assets)$('help').textContent='계산 엔진이 포함된 오프라인 버전입니다.';
+function b64(bytes){let text='';for(let i=0;i<bytes.length;i+=16384)text+=String.fromCharCode(...bytes.subarray(i,i+16384));return btoa(text)}
+function bytes(value){return Uint8Array.from(atob(value),c=>c.charCodeAt(0))}
+async function get(path){const url=new URL(path,base);if(!url.href.startsWith(base))throw Error('엔진 경로 오류');const response=await fetch(url,{credentials:'omit',referrerPolicy:'no-referrer'});if(!response.ok)throw Error('엔진 다운로드 실패 ('+response.status+')');return response}
+async function load(){
+ if(engine)return engine;
+ if(!assets){
+  const pkg=await (await get('package.json')).json(),entry=pkg.main||'immunum.js';
+  const js=await (await get(entry)).text();
+  const wasmPath=js.match(/['"]([^'"]+\.wasm)['"]/)?.[1]||'immunum_bg.wasm';
+  const folder=entry.includes('/')?entry.slice(0,entry.lastIndexOf('/')+1):'';
+  const wasm=new Uint8Array(await (await get(folder+wasmPath)).arrayBuffer());
+  assets={js:b64(new TextEncoder().encode(js)),wasm:b64(wasm)};
+ }
+ const binary=bytes(assets.wasm),module={exports:{}};
+ function requirePackage(name){
+  switch(name.replace(/^node:/,'')){
+   case 'fs':return {readFileSync:()=>binary};
+   case 'path':return {join:(...parts)=>parts.join('/'),resolve:(...parts)=>parts.join('/'),dirname:()=>'.'};
+   case 'util':return {TextDecoder,TextEncoder};
+   default:throw Error('지원되지 않는 엔진 모듈: '+name);
+  }
+ }
+ module.require=requirePackage;
+ new Function('module','exports','require','__dirname','__filename',new TextDecoder().decode(bytes(assets.js)))(module,module.exports,requirePackage,'.','immunum.js');
+ if(!module.exports.Annotator)throw Error('계산 엔진을 시작할 수 없습니다.');
+ engine=module.exports;$('save').hidden=false;return engine;
+}
+function sequence(raw){
+ const lines=raw.trim().split(/\r?\n/);
+ if(lines[0].startsWith('>'))lines.shift();
+ const seq=lines.join('').replace(/\s/g,'').toUpperCase();
+ if(!/^[ACDEFGHIKLMNPQRSTVWYX]+$/.test(seq))throw Error('VH 또는 VL 아미노산 서열 하나를 입력하세요.');
+ return seq;
+}
+function number(api,seq,scheme){
+ const annotator=new api.Annotator(['ig'],scheme.toLowerCase());
+ try{const result=annotator.number(seq);if(result.error||!result.numbering)throw Error(result.error||'번호를 부여할 수 없습니다.');return result}finally{annotator.free()}
+}
+function positions(result,seq){
+ const map=new Map();let i=result.queryStart;
+ for(const [pos,aa] of result.numbering){if(aa==='-')continue;if(aa!==seq[i])throw Error('번호와 원본 서열의 대응을 확인할 수 없습니다.');map.set(i++,{pos,aa})}
+ if(i-1!==result.queryEnd)throw Error('서열 범위 검증에 실패했습니다.');return map;
+}
+function makeRows(api,seq,scheme,basis){
+ const display=number(api,seq,scheme),reference=scheme===basis?display:number(api,seq,basis);
+ if(display.chain!==reference.chain)throw Error('번호 체계 간 체인 판정이 다릅니다.');
+ const tag=display.chain==='H'?'H':'L',lookup=positions(reference,seq),spans=api.regionsFor(scheme.toLowerCase(),display.chain);
+ const rows=[];
+ for(const [i,{pos,aa}] of positions(display,seq)){
+  const n=parseInt(pos,10),region=Object.entries(spans).find(([,v])=>n>=v[0]&&n<=v[1])?.[0]?.toUpperCase()||'—';
+  const key=lookup.has(i)?tag+lookup.get(i).pos:'';
+  rows.push([i+1,tag+pos,aa,region,key||'—',packing.has(key)?'Packing residue':vernier.has(key)?'Vernier zone':'']);
+ }
+ return {chain:display.chain,rows};
+}
+function clearResults(){$('panel').hidden=true;$('rows').replaceChildren();$('status').textContent=''}
+for(const id of ['seq','scheme','basis'])$(id).oninput=clearResults;
+$('run').onclick=async()=>{
+ clearResults();
+ try{
+  const seq=sequence($('seq').value);for(const id of ['run','seq','scheme','basis'])$(id).disabled=true;
+  $('status').textContent=assets?'분석 중…':'계산 엔진을 불러오는 중…';
+  const api=await load(),scheme=$('scheme').value,{chain,rows}=makeRows(api,seq,scheme,$('basis').value);
+  const fragment=document.createDocumentFragment();
+  for(const row of rows){const tr=document.createElement('tr');if(row[3].startsWith('CDR'))tr.className='cdr';for(const item of row){const cell=document.createElement('td');cell.textContent=item;tr.append(cell)}fragment.append(tr)}
+  $('rows').append(fragment);$('heading').textContent=scheme+' · '+({H:'VH',K:'Vκ',L:'Vλ'}[chain]||chain)+' · '+rows.length+' residues';
+  $('panel').hidden=false;$('status').textContent='';
+ }catch(error){$('status').textContent='분석 실패 · '+(error.message||error)}
+ finally{for(const id of ['run','seq','scheme','basis'])$(id).disabled=false}
+};
+$('save').onclick=()=>{
+ const doc=new DOMParser().parseFromString(initialHTML,'text/html');
+ doc.getElementById('bundle').textContent=JSON.stringify(assets);
+ doc.getElementById('seq').textContent='';
+ const link=document.createElement('a'),url=URL.createObjectURL(new Blob(['<!doctype html>'+doc.documentElement.outerHTML],{type:'text/html'}));
+ link.href=url;link.download='Antibody_Numbering_offline.html';link.click();setTimeout(()=>URL.revokeObjectURL(url),3000);
+};
+</script></html>
