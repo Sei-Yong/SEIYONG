@@ -347,19 +347,42 @@
         gap: 0;
       }
     }
-  </style>
+  
+:root{--ink:#203e35;--quiet:#536b61;--edge:#cddbd2;--paper:#f3f5ef;--accent:#205e48}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 Inter,"Segoe UI",sans-serif}
+.container{width:min(1250px,100%);padding:clamp(18px,4vw,54px);background:transparent;border:0;box-shadow:none}
+.back-link{text-align:left;margin:0 0 18px}.back-link a{font-size:14px;color:var(--quiet)}
+.hero{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(250px,1fr);gap:35px;align-items:center;background:#173e34;color:white;border-radius:16px;padding:clamp(22px,4vw,44px);margin-bottom:16px}
+h1{font:500 clamp(33px,4.1vw,58px)/1.05 Georgia,serif;letter-spacing:-.045em;text-align:left;color:#fbfff6;margin:0}
+.subtitle{text-align:left;color:#c2d8b8;margin:12px 0 0;font-size:13px}
+.model-note{background:transparent;color:#e7f0e6;border:0;border-left:1px solid #628275;border-radius:0;margin:0;padding:5px 0 5px 23px;font-size:14px}.model-note strong{color:white}
+.input-panel{background:white;border:1px solid var(--edge);border-radius:16px;padding:clamp(18px,3vw,30px)}
+.form-head{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:20px}.form-head h2{margin:0}
+h2{color:var(--ink);font-size:21px;letter-spacing:-.025em;margin:28px 0 10px}.example-row{max-width:100%}.example-row label{font-size:12px}
+textarea,select,button{font-family:inherit}.example-row select{width:auto;max-width:100%;margin:3px 0 0;font-size:14px;background:white;color:var(--ink);border-color:var(--edge)}
+label{color:var(--ink)}textarea{background:#f8faf7;color:#1a362f;border-color:#bccfc2;font:14px/1.6 ui-monospace,Consolas,monospace}.input-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.input-help{color:var(--quiet);font-size:13px}
+.button-group{justify-content:flex-start}.button-group button{width:auto;padding:10px 18px;margin:4px 0;background:var(--accent);border-color:var(--accent)}.button-group button:hover{background:#134630}.button-group .secondary{background:white;color:var(--accent);border-color:var(--edge)}.button-group .secondary:hover{background:#eaf2ea}
+textarea:focus,select:focus,button:focus-visible,a:focus-visible{outline:3px solid #91b69e;outline-offset:2px}
+.result-summary,.two-column{grid-template-columns:repeat(3,minmax(0,1fr))}.two-column{grid-template-columns:repeat(2,minmax(0,1fr))}.two-column>*{min-width:0}
+.summary-card{background:#fff;border:1px solid var(--edge);border-top:3px solid #5f8b74;border-radius:10px}.summary-value{color:var(--ink);font-size:clamp(21px,2vw,29px)}.summary-label,.summary-detail{color:var(--quiet)}.risk-high{color:#aa292f}.risk-medium{color:#92570c}.risk-low{color:#246644}
+.table-wrap{background:white;border:1px solid var(--edge);border-radius:10px}th{background:#e5eee6;color:#244d38}td,th{border-color:#dfe9e1;font-size:14px}.two-column table{min-width:410px}tbody tr:hover{background:#f4f8f3}.risk-fill{background:#387963}.limitations{background:#ebf0e9;color:var(--quiet)}footer{margin:0 auto 30px;color:var(--quiet)}
+@media(max-width:780px){.hero{grid-template-columns:1fr;gap:18px}.model-note{border-left:0;border-top:1px solid #628275;padding:15px 0 0}.form-head{align-items:flex-start;flex-direction:column}.input-grid,.result-summary,.two-column{grid-template-columns:1fr}.button-group{flex-direction:row;gap:8px}.container{padding:16px}}
+</style>
 </head>
 <body>
   <main class="container">
-    <h1>Antibody Developability Predictor</h1>
-    <p class="subtitle">Prototype</p>
+        <div class="back-link">
+      <a href="AP-000-Main.html">&larr; Back to Main</a>
+    </div>
+<header class="hero"><div><h1>Antibody Developability Predictor</h1>
+    <p class="subtitle">Prototype</p></div>
 
     <div class="model-note">
       <strong>Two result modes:</strong> an exact VH/VL match returns known experimental labels. A new sequence receives a sequence-only screen using four calibrated classifiers plus a conservative hydrophobic-burden rescue. G1 now requires agreement between the charge/physicochemical model and an independent amino-acid-composition model, so charge alone cannot trigger G1.
     </div>
 
-    <div class="example-row">
-      <label for="exampleSelect">Load reference example:</label>
+    </header><section class="input-panel"><div class="form-head"><h2>Sequence input</h2><div class="example-row">
+      <label for="exampleSelect">Reference example</label>
       <select id="exampleSelect">
         <option value="">Select an antibody</option>
         <option value="dalotuzumab">Dalotuzumab — 3 experimental flag groups</option>
@@ -369,11 +392,11 @@
       </select>
     </div>
 
-    <div class="input-grid">
-      <label for="vhSequence">Enter VH variable-domain sequence:
+    </div><div class="input-grid">
+      <label for="vhSequence">VH variable domain
         <textarea id="vhSequence" rows="6" spellcheck="false" placeholder="e.g. EVQLVESGGGLVQPGGSLRLSCAAS..."></textarea>
       </label>
-      <label for="vlSequence">Enter VL variable-domain sequence:
+      <label for="vlSequence">VL variable domain
         <textarea id="vlSequence" rows="6" spellcheck="false" placeholder="e.g. DIQMTQSPSSLSASVGDRVTITC..."></textarea>
       </label>
     </div>
@@ -387,7 +410,7 @@
 
     <div class="error" id="errorMessage" role="alert" hidden></div>
 
-    <section id="results" aria-live="polite" hidden>
+    </section><section id="results" aria-live="polite" hidden>
       <div class="result-summary">
         <div class="summary-card">
           <span class="summary-label">Analysis mode</span>
@@ -483,9 +506,7 @@
       <div class="limitations" id="interpretationNote"></div>
     </section>
 
-    <div class="back-link">
-      <a href="AP-000-Main.html">&larr; Back to Main</a>
-    </div>
+
   </main>
 
   <footer>
