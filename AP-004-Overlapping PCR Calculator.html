@@ -1,147 +1,76 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Overlapping PCR Calculator</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      margin: 0;
-      padding: 40px;
-    }
-    .container {
-      max-width: 1200px;
-      margin: auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    table { border-collapse: collapse; margin: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: center; }
-    .gray { background-color: #ddd; }
-    .yellow { background-color: #ffff99; }
-    input[type="number"] { width: 80px; }
-    .flex-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-    }
-    footer {
-      text-align: center;
-      margin-top: 10px;
-      color: #666;
-      font-size: 14px;
-    }
-  </style>
-</head>
-<body>
-<div class="container">
-  <h2 style="text-align: center">Overlapping PCR Calculator</h2>
-
-  <!-- Fragment Inputs -->
-  <div class="flex-container">
-    <table>
-      <tr><th colspan="3">Fragment Information</th></tr>
-      <tr><th>Fragment</th><th>Size (bp)</th><th>Conc. (ng/uL)</th></tr>
-      <tr><td>Fragment 1</td><td><input type="number" id="f1Size" class="yellow"></td><td><input type="number" id="f1Conc" class="yellow"></td></tr>
-      <tr><td>Fragment 2</td><td><input type="number" id="f2Size" class="yellow"></td><td><input type="number" id="f2Conc" class="yellow"></td></tr>
-      <tr><td>Fragment 3</td><td><input type="number" id="f3Size" class="yellow"></td><td><input type="number" id="f3Conc" class="yellow"></td></tr>
-      <tr><td>Fragment 4</td><td><input type="number" id="f4Size" class="yellow"></td><td><input type="number" id="f4Conc" class="yellow"></td></tr>
-    </table>
-
-    <!-- Overlapping PCR (100uL) Table -->
-    <table>
-      <tr><th colspan="2">Overlapping PCR (100uL)</th></tr>
-      <tr><td>Fragment 1</td><td id="f1Vol"></td></tr>
-      <tr><td>Fragment 2</td><td id="f2Vol"></td></tr>
-      <tr><td>Fragment 3</td><td id="f3Vol"></td></tr>
-      <tr><td>Fragment 4</td><td id="f4Vol"></td></tr>
-      <tr><td>2x-pfu</td><td>50.00</td></tr>
-      <tr><td>N-sol</td><td>8.00</td></tr>
-      <tr><td>Primer For</td><td>0.40</td></tr>
-      <tr><td>Primer Rev</td><td>0.40</td></tr>
-      <tr><td>UPW</td><td id="fUpw"></td></tr>
-    </table>
-
-    <!-- Output Table -->
-    <table>
-      <tr><th colspan="2">Overlapping PCR (Library)</th></tr>
-      <tr><td colspan="3">Library PCR Volume (uL): <input type="number" id="libVol" value="200" class="yellow"></td></tr>
-      <tr><td>Fragment 1</td><td id="lib1"></td></tr>
-      <tr><td>Fragment 2</td><td id="lib2"></td></tr>
-      <tr><td>Fragment 3</td><td id="lib3"></td></tr>
-      <tr><td>Fragment 4</td><td id="lib4"></td></tr>
-      <tr><td>2x-pfu</td><td id="pfu"></td></tr>
-      <tr><td>N-sol</td><td id="nsol"></td></tr>
-      <tr><td>Primer F</td><td id="primerF"></td></tr>
-      <tr><td>Primer R</td><td id="primerR"></td></tr>
-      <tr><td>UPW</td><td id="upw"></td></tr>
-    </table>
-  </div>
-  <div style="text-align: center; margin-top: 30px;">
-  <a href="AP-000-Main.html" style="font-size: 16px; color: #007acc; text-decoration: none;">&larr; Back to Main</a>
-</div>
-</div>
-
-<footer>
-  <div>Copyright 2025-2026. Jun Sei-Yong All rights reserved.</div>
-</footer>
-
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Overlapping PCR Calculator</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f5ef;color:#1c392f;font:15px/1.5 Inter,"Segoe UI",sans-serif}
+main{max-width:1180px;margin:auto;padding:clamp(16px,4vw,50px)}
+nav a{color:#45634f;text-decoration:none}nav a:hover{text-decoration:underline}
+header{background:#193d32;color:#fbfff6;padding:clamp(23px,4vw,40px);margin:20px 0 16px;border-radius:16px}
+h1{font:500 clamp(36px,5vw,57px)/1.06 Georgia,serif;letter-spacing:-.045em;margin:0}
+header p{color:#d7e7d8;margin:12px 0 0}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);align-items:start;gap:16px}
+section{background:white;border:1px solid #cddbd0;border-radius:15px;padding:clamp(14px,2.4vw,28px)}
+h2{font-size:21px;letter-spacing:-.025em;margin:0 0 16px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:9px 7px;border-bottom:1px solid #e3eae3}
+thead th{background:#edf3ed;color:#345541;font-size:13px}
+tbody th{font-weight:500}
+.result td,.result thead th:not(:first-child){text-align:right}
+.result tr:last-child{background:#f4f7ee}
+input{font:inherit;color:#193d32;border:1px solid #afc3b5;background:#f8faf6;border-radius:7px;width:100%;padding:8px;min-width:0}
+.inputs{table-layout:fixed}.inputs th:first-child{width:28%}
+.setting{margin-top:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:600}
+.setting input{width:7em}
+:focus-visible{outline:3px solid #83a990;outline-offset:2px}
+footer{margin-top:22px;font-size:13px;color:#526b59}
+@media(max-width:760px){.layout{grid-template-columns:1fr}}
+</style></head><body><main>
+<nav><a href="AP-000-Main.html">← Back to Main</a></nav>
+<header><h1>Overlapping PCR Calculator</h1><p>Enter fragment sizes and concentrations to compare standard and library reaction volumes.</p></header>
+<div class="layout"><section><h2>Fragment inputs</h2><table class="inputs"><thead><tr><th>Fragment</th><th>Size (bp)</th><th>Concentration (ng/µL)</th></tr></thead><tbody><tr><th scope="row">Fragment 1</th><td><input type="number" step="any" aria-label="Fragment 1 size in bp" id="f1Size"></td><td><input type="number" step="any" aria-label="Fragment 1 concentration in ng/µL" id="f1Conc"></td></tr>
+<tr><th scope="row">Fragment 2</th><td><input type="number" step="any" aria-label="Fragment 2 size in bp" id="f2Size"></td><td><input type="number" step="any" aria-label="Fragment 2 concentration in ng/µL" id="f2Conc"></td></tr>
+<tr><th scope="row">Fragment 3</th><td><input type="number" step="any" aria-label="Fragment 3 size in bp" id="f3Size"></td><td><input type="number" step="any" aria-label="Fragment 3 concentration in ng/µL" id="f3Conc"></td></tr>
+<tr><th scope="row">Fragment 4</th><td><input type="number" step="any" aria-label="Fragment 4 size in bp" id="f4Size"></td><td><input type="number" step="any" aria-label="Fragment 4 concentration in ng/µL" id="f4Conc"></td></tr>
+</tbody></table><label class="setting">Library reaction volume (µL)<input type="number" id="libVol" step="any" value="200"></label></section>
+<section><h2>Reaction volumes</h2><table class="result"><thead><tr><th>Component</th><th>Standard<br>100 µL</th><th>Library<br><span id="libHeading">200 µL</span></th></tr></thead><tbody><tr><th scope="row">Fragment 1</th><td id="f1Vol">—</td><td id="lib1">—</td></tr>
+<tr><th scope="row">Fragment 2</th><td id="f2Vol">—</td><td id="lib2">—</td></tr>
+<tr><th scope="row">Fragment 3</th><td id="f3Vol">—</td><td id="lib3">—</td></tr>
+<tr><th scope="row">Fragment 4</th><td id="f4Vol">—</td><td id="lib4">—</td></tr>
+<tr><th scope="row">2× Pfu</th><td>50.00</td><td id="pfu">—</td></tr>
+<tr><th scope="row">N-sol</th><td>8.00</td><td id="nsol">—</td></tr>
+<tr><th scope="row">Forward primer</th><td>0.40</td><td id="primerF">—</td></tr>
+<tr><th scope="row">Reverse primer</th><td>0.40</td><td id="primerR">—</td></tr>
+<tr><th scope="row">Ultrapure water</th><td id="fUpw">—</td><td id="upw">—</td></tr>
+</tbody></table></section></div><footer>© 2025–2026 Sei-Yong Jun. All rights reserved.</footer></main>
 <script>
-function calcOverlappingPCR() {
-  const sizes = [1,2,3,4].map(i => parseFloat(document.getElementById(`f${i}Size`).value));
-  const concs = [1,2,3,4].map(i => parseFloat(document.getElementById(`f${i}Conc`).value));
-  const libVol = parseFloat(document.getElementById('libVol').value);
-  const baseFactor = 1515;
-
-  // 기본 부피 계산 (100uL 기준)
-  const baseVolumes = sizes.map((size, i) => {
-    const conc = concs[i];
-    return (size && conc) ? (1 / (conc / 1000 * baseFactor / size)) : 0;
-  });
-  const baseTotal = baseVolumes.reduce((sum, v) => sum + v, 0);
-  const fixed100uL = 50 + 8 + 0.4 + 0.4;
-  const upw100uL = 100 - baseTotal - fixed100uL;
-
-  // Library PCR 계산
-  const libVolumes = sizes.map((size, i) => {
-    const conc = concs[i];
-    return (size && conc) ? (2.5 / (conc / 1000 * baseFactor / size)) : 0;
-  });
-  const scaledVolumes = libVolumes.map(v => v * (libVol / 100));
-  const fixedVals = {
-    pfux2: 50 * (libVol / 100),
-    nsol: 8 * (libVol / 100),
-    primerF: 0.6 * (libVol / 100),
-    primerR: 0.6 * (libVol / 100),
-  };
-  const totalUsed = scaledVolumes.reduce((sum, v) => sum + v, 0)
-    + fixedVals.pfux2 + fixedVals.nsol + fixedVals.primerF + fixedVals.primerR;
-  const upw = libVol - totalUsed;
-
-  // 결과 출력
-  baseVolumes.forEach((v, i) => {
-    document.getElementById(`f${i+1}Vol`).textContent = v.toFixed(2);
-  });
-  document.getElementById("fUpw").textContent = upw100uL.toFixed(2);
-
-  scaledVolumes.forEach((v, i) => {
-    document.getElementById(`lib${i+1}`).textContent = v.toFixed(2);
-  });
-  document.getElementById("pfu").textContent = fixedVals.pfux2.toFixed(2);
-  document.getElementById("nsol").textContent = fixedVals.nsol.toFixed(2);
-  document.getElementById("primerF").textContent = fixedVals.primerF.toFixed(2);
-  document.getElementById("primerR").textContent = fixedVals.primerR.toFixed(2);
-  document.getElementById("upw").textContent = upw.toFixed(2);
+const byId = id => document.getElementById(id);
+function calculate() {
+  const volume = byId('libVol').valueAsNumber;
+  const scale = volume / 100;
+  byId('libHeading').textContent = Number.isFinite(volume) ? volume + ' µL' : '—';
+  let baseTotal = 0;
+  let libraryTotal = 0;
+  function show(id, value) {
+    byId(id).textContent = Number.isFinite(value) ? value.toFixed(2) : '—';
+  }
+  for (let i = 1; i <= 4; i++) {
+    const size = byId('f' + i + 'Size').valueAsNumber;
+    const concentration = byId('f' + i + 'Conc').valueAsNumber;
+    const factor = concentration / 1000 * 1515 / size;
+    const standard = size && concentration ? 1 / factor : 0;
+    const library = (size && concentration ? 2.5 / factor : 0) * scale;
+    show('f' + i + 'Vol', standard);
+    show('lib' + i, library);
+    baseTotal += standard;
+    libraryTotal += library;
+  }
+  show('fUpw', 100 - baseTotal - (50 + 8 + 0.4 + 0.4));
+  for (const [id, amount] of Object.entries({pfu: 50, nsol: 8, primerF: 0.6, primerR: 0.6})) {
+    show(id, amount * scale);
+    libraryTotal += amount * scale;
+  }
+  show('upw', volume - libraryTotal);
 }
-
-["f1Size", "f1Conc", "f2Size", "f2Conc", "f3Size", "f3Conc", "f4Size", "f4Conc", "libVol"]
-  .forEach(id => document.getElementById(id).addEventListener("input", calcOverlappingPCR));
-</script>
-</body>
-</html>
-
-
+document.querySelectorAll('input').forEach(input => input.addEventListener('input', calculate));
+</script></body></html>
