@@ -35,6 +35,7 @@ body{font:14px/1.52 Inter,"Segoe UI",sans-serif}.app{max-width:1440px;padding:cl
  <section class="panel viewer-panel"><div class="viewer-top"><b>Complex viewer · Cα trace</b><div class="toolbar"><button class="btn smallbtn" id="view-focus">Interface</button><button class="btn smallbtn" id="view-all">Full structure</button><button class="btn smallbtn" id="view-reset">Reset view</button></div></div><div class="visbox"><canvas id="viewer" aria-label="Rotatable Cα trace of the complex"></canvas><div id="viewer-empty" class="empty-template" style="position:absolute;inset:0;pointer-events:none"><div><div style="font-size:28px;margin-bottom:8px">⌁</div><strong>Structure preview</strong><p class="small">Load a PDB or mmCIF structure to begin.</p></div></div></div><div class="viewer-foot"><span class="legend"><span><i class="dot" style="background:#3586a5"></i>Antigen</span><span><i class="dot" style="background:#e39943"></i>Binder</span><span><i class="dot" style="background:#e45162"></i>Selected site</span></span><span>Drag to rotate · Scroll to zoom</span></div></section>
 <section class="panel"><div class="contenthead"><div><h2>Interface residues <span id="rank-count" style="font-size:11px;color:#8da0ae"></span></h2></div><div class="toolbar"><button class="btn smallbtn" id="download-csv" disabled>↓ CSV</button><button class="btn smallbtn" id="download-pml" disabled>↓ PyMOL</button></div></div><div class="contenthead"><div class="tabs"><button class="tab active" data-tab="his">His substitution candidates</button><button class="tab" data-tab="interface">All interface residues</button><button class="tab" data-tab="selected">Selected candidates</button></div><div class="toolbar"><input class="control" aria-label="Find a residue" id="filter" placeholder="Find residue (B:49 or L69)" style="width:200px;padding:7px 9px"/><select aria-label="Sort residues" id="sort" class="control" style="width:145px;padding:7px 8px;height:32px"><option value="score">Screening score</option><option value="distance">Cα distance</option><option value="chain">Chain / residue number</option></select></div></div>
 <div class="table-wrap"><table><thead><tr id="result-columns"></tr></thead><tbody id="candidate-rows"></tbody></table></div></section>
+<section class="panel" id="pair-panel" hidden><div class="contenthead"><h2>Antigen–antibody interaction candidates</h2><select class="control" id="pair-type" aria-label="Interaction type"><option value="">All interaction types</option><option>Hydrophobic contact</option><option>Hydrogen bond</option><option>Salt bridge</option><option>π–π stacking</option></select></div><p class="small" id="pair-count"></p><div class="table-wrap"><table><thead><tr><th>Interaction</th><th>Antigen residue</th><th>Antibody residue</th><th>Atoms or ring members (Ag ↔ Ab)</th><th>Distance</th><th>Geometry</th></tr></thead><tbody id="pair-rows"></tbody></table></div><details><summary>How contacts are assigned</summary><p>All residues with Cα on the selected partners are screened independently of the His screen, its Cα cutoff and loop ranges. Each row reports the closest qualifying contact of its type for one residue pair.</p><p>Hydrophobic: side-chain C/S atoms of A/V/I/L/M/F/W/P/Y within 4.0 Å. Hydrogen bond candidate: compatible backbone or side-chain donor and acceptor heavy atoms within 3.5 Å; hydrogen positions, directionality and protonation are unresolved. Salt bridge: Lys/Arg side-chain nitrogen and Asp/Glu carboxylate oxygen within 4.0 Å. One pair may qualify for multiple types.</p><p>π–π: complete Phe, Tyr, Trp or His rings, centroids within 5.5 Å, acute interplanar angle ≤30° or ≥60°, and smaller lateral offset ≤2 Å. Ring distances are centroid distances. Static coordinates support geometric hypotheses; side-chain placement in a model can change assignments.</p></details></section>
 <section class="panel" id="selected-info" style="display:none"><div class="contenthead"><h2>Selected candidate details</h2><button class="btn smallbtn" id="copy-list">Copy mutation list</button></div><div id="selected-detail" class="top-rank-grid"></div></section>
 <details class="panel scoring"><summary>How the His screening score is calculated</summary><div class="method">
 <p>Binder residues within the distance cutoff are ranked after wild-type His is excluded. Higher scores indicate higher screening priority.</p>
@@ -93,11 +94,86 @@ function siteScore(o){let s=24+Math.max(0,10-o.closest.d)*2.1;const pos=o.pos.d<
  if(o.arom.d<5.5)s-=3; // cation-pi may stabilize acid
  return Math.max(0,Math.min(100,Math.round(s)))}
 function classify(o){const h=o.hyd.d<=8,p=o.pos.d<=8,n=o.neg.d<=7;let mech='Structural screening';if(h&&p)mech='Hydrophobic and positively charged environment';else if(p)mech='His⁺ electrostatic repulsion';else if(h)mech='His⁺ burial penalty';else if(o.arom.d<=8)mech='Aromatic packing';return{mech,cls:h&&p?'mixed':p?'pos':h?'hyd':'',risk:[n?'Possible His⁺ stabilization by nearby Asp/Glu':null,o.arom.d<=5.5?'Possible cation–π interaction':null,['G','P'].includes(o.r.aa)?'Potential backbone or loop sensitivity':null,['D','E'].includes(o.r.aa)?'Loss of an acidic group':null,['K','R'].includes(o.r.aa)?'Loss of a positive charge':null,AROM.has(o.r.aa)?'Possible loss of aromatic packing':null,o.facing!==null&&o.facing<-.3?'Cβ points away from the antigen':null].filter(Boolean)}}
-function analyze(){if(!structure)return;const ag=$('antigen-chain').value,bds=binderChains();if(!bds.length){tip('Select at least one binder chain.');return}const cutoff=Number($('ca-cutoff').value);const agResidues=structure.residues.filter(r=>r.chain===ag),bdResidues=structure.residues.filter(r=>bds.includes(r.chain)),agAtoms=agResidues.flatMap(r=>r.atoms),regions=regionMap($('ranges').value);
+const donors={ARG:['NE','NH1','NH2'],LYS:['NZ'],SER:['OG'],THR:['OG1'],TYR:['OH'],ASN:['ND2'],GLN:['NE2'],TRP:['NE1'],HIS:['ND1','NE2']};
+const acceptors={ASP:['OD1','OD2'],GLU:['OE1','OE2'],ASN:['OD1'],GLN:['OE1'],SER:['OG'],THR:['OG1'],TYR:['OH'],HIS:['ND1','NE2']};
+const rings={PHE:['CG CD1 CE1 CZ CE2 CD2'],TYR:['CG CD1 CE1 CZ CE2 CD2'],HIS:['CG ND1 CE1 NE2 CD2'],TRP:['CG CD1 NE1 CE2 CD2','CD2 CE2 CZ2 CH2 CZ3 CE3']};
+const dot3=(a,b)=>a.reduce((s,v,i)=>s+v*b[i],0);
+function contactSites(residues){
+ const sites=[];
+ for(const r of residues){
+   for(const a of r.atoms){
+     const n=a.atom,t=r.res3;
+     const donor=(n==='N'&&t!=='PRO')||donors[t]?.includes(n);
+     const acceptor=n==='O'||n==='OXT'||acceptors[t]?.includes(n);
+     const charge=(t==='LYS'&&n==='NZ'||t==='ARG'&&['NE','NH1','NH2'].includes(n))?1:
+       (t==='ASP'&&['OD1','OD2'].includes(n)||t==='GLU'&&['OE1','OE2'].includes(n))?-1:0;
+     const hyd=HYDRO.has(r.aa)&&((n.startsWith('C')&&n!=='C'&&n!=='CA')||(t==='MET'&&n==='SD'));
+     if(donor||acceptor||charge||hyd)sites.push({...a,r,label:n,donor,acceptor,charge,hyd});
+   }
+   for(const names of rings[r.res3]||[]){
+     const ring=names.split(' ').map(n=>r.atoms.find(a=>a.atom===n));
+     if(ring.includes(undefined))continue;
+     const center=Object.fromEntries(['x','y','z'].map(k=>[k,ring.reduce((s,a)=>s+a[k],0)/ring.length]));
+     const normal=[0,0,0];
+     for(let i=0;i<ring.length;i++){
+       const a=ring[i],b=ring[(i+1)%ring.length];
+       normal[0]+=(a.y-b.y)*(a.z+b.z); normal[1]+=(a.z-b.z)*(a.x+b.x); normal[2]+=(a.x-b.x)*(a.y+b.y);
+     }
+     const length=Math.hypot(...normal);
+     if(length>1e-6)sites.push({...center,r,label:names,normal:normal.map(x=>x/length)});
+   }
+ }
+ return sites;
+}
+function pairContacts(ag,ab){
+ const grid=new Map(),best=new Map(),cell=a=>[a.x,a.y,a.z].map(v=>Math.floor(v/5.5));
+ for(const a of contactSites(ag)){
+   const key=cell(a).join(',');
+   if(!grid.has(key))grid.set(key,[]);grid.get(key).push(a);
+ }
+ for(const b of contactSites(ab)){
+   const [x,y,z]=cell(b);
+   for(let i=x-1;i<=x+1;i++)for(let j=y-1;j<=y+1;j++)for(let k=z-1;k<=z+1;k++){
+     for(const a of grid.get([i,j,k].join(','))||[]){
+       const d=Math.sqrt(d2(a,b));if(d>5.5||d<0.01)continue;
+       function record(type,note=''){
+         const key=JSON.stringify([a.r.chain,a.r.seq,b.r.chain,b.r.seq,type]);
+         if(!best.has(key)||d<best.get(key).d)best.set(key,{a,b,d,type,note});
+       }
+       if(a.normal&&b.normal){
+         const v=[b.x-a.x,b.y-a.y,b.z-a.z];
+         const angle=Math.acos(Math.min(1,Math.abs(dot3(a.normal,b.normal))))*180/Math.PI;
+         const offsets=[a,b].map(s=>Math.sqrt(Math.max(0,d*d-dot3(v,s.normal)**2)));
+         if((angle<=30||angle>=60)&&Math.min(...offsets)<=2)record('π–π stacking', (angle<=30?'Parallel':'T-shaped')+' · '+angle.toFixed(1)+'° · offset '+Math.min(...offsets).toFixed(2)+' Å');
+       }else{
+         if(a.hyd&&b.hyd&&d<=4)record('Hydrophobic contact');
+         if(a.charge*b.charge===-1&&d<=4)record('Salt bridge');
+         if(d<=3.5&&(a.donor&&b.acceptor||a.acceptor&&b.donor))record('Hydrogen bond',a.donor&&b.acceptor&&a.acceptor&&b.donor?'Either donor assignment':a.donor&&b.acceptor?'Antigen donor':'Antibody donor');
+       }
+     }
+   }
+ }
+ return [...best.values()].sort((a,b)=>a.d-b.d);
+}
+function showContacts(){
+ const type=$('pair-type').value;
+ const rows=(result?.pairs||[]).filter(p=>!type||p.type===type);
+ const frag=document.createDocumentFragment();
+ for(const p of rows){
+   const tr=el('tr');
+   for(const v of [p.type,aaLabel(p.a.r),aaLabel(p.b.r),p.a.label+' ↔ '+p.b.label,fmt(p.d),p.note||'—'])tr.append(el('td',{},v));
+   frag.append(tr);
+ }
+ $('pair-rows').replaceChildren(frag);
+ $('pair-count').textContent=rows.length?rows.length+' candidate contacts':'No matching contacts.';
+}
+
+$('pair-type').onchange=showContacts;
+function analyze(){if(!structure)return;const ag=$('antigen-chain').value,bds=binderChains();if(!bds.length){$('pair-panel').hidden=true;tip('Select at least one binder chain.');return}const cutoff=Number($('ca-cutoff').value);const agResidues=structure.residues.filter(r=>r.chain===ag),bdResidues=structure.residues.filter(r=>bds.includes(r.chain)),agAtoms=agResidues.flatMap(r=>r.atoms),regions=regionMap($('ranges').value);
  let obs=bdResidues.map(r=>calDistance(r,agResidues,agAtoms)).filter(o=>o.closest.d<=cutoff);obs.forEach(o=>{o.region=annotate(o.r,regions);o.score=siteScore(o);Object.assign(o,classify(o))});const all=obs.filter(o=>$('scope').value==='all'||o.region!=='Unassigned region');const his=all.filter(o=>o.r.aa!=='H').sort((a,b)=>b.score-a.score||a.closest.d-b.closest.d);result={ag,bds,agResidues,bdResidues,agAtoms,all,his,cutoff};
  $('stat-ag').textContent=agResidues.length;$('stat-ag-sub').textContent=`Chain ${ag}`;$('stat-bd').textContent=bdResidues.length;$('stat-bd-sub').textContent=bds.map(x=>'Chain '+x).join(' + ');$('stat-if').textContent=all.length;$('stat-hi').textContent=his.length;$('download-csv').disabled=false;$('download-pml').disabled=false;
  const ids=new Set(his.map(o=>keyOf(o.r)));selected=new Set([...selected].filter(x=>ids.has(x)));
- renderAll();tip(`${all.length} interface residues · ${his.length} His substitution candidates`)}
+ result.pairs=pairContacts(agResidues,bdResidues);showContacts();$('pair-panel').hidden=false;renderAll();tip(`${all.length} interface residues · ${his.length} His substitution candidates`)}
 const keyOf=r=>`${r.chain}:${r.seq}`,aaLabel=r=>`${r.chain}:${r.aa}${r.seq}`,mutation=o=>`${o.r.chain}-${o.r.aa}${o.r.seq}H`,fmt=x=>Number.isFinite(x)?x.toFixed(2)+' Å':'—';
 function nearby(x){if(!x.atom)return'—';const a=x.atom;return `${a.aa}${a.seq} (${a.chain})`}
 const residueLabel = r => `${r.chain}-${r.aa}${r.seq}`;
