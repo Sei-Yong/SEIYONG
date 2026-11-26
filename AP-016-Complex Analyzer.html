@@ -35,7 +35,7 @@ body{font:14px/1.52 Inter,"Segoe UI",sans-serif}.app{max-width:1440px;padding:cl
  <section class="panel viewer-panel"><div class="viewer-top"><b>Complex viewer · Cα trace</b><div class="toolbar"><button class="btn smallbtn" id="view-focus">Interface</button><button class="btn smallbtn" id="view-all">Full structure</button><button class="btn smallbtn" id="view-reset">Reset view</button></div></div><div class="visbox"><canvas id="viewer" aria-label="Rotatable Cα trace of the complex"></canvas><div id="viewer-empty" class="empty-template" style="position:absolute;inset:0;pointer-events:none"><div><div style="font-size:28px;margin-bottom:8px">⌁</div><strong>Structure preview</strong><p class="small">Load a PDB or mmCIF structure to begin.</p></div></div></div><div class="viewer-foot"><span class="legend"><span><i class="dot" style="background:#3586a5"></i>Antigen</span><span><i class="dot" style="background:#e39943"></i>Binder</span><span><i class="dot" style="background:#e45162"></i>Selected site</span></span><span>Drag to rotate · Scroll to zoom</span></div></section>
 <section class="panel"><div class="contenthead"><div><h2>Interface residues <span id="rank-count" style="font-size:11px;color:#8da0ae"></span></h2></div><div class="toolbar"><button class="btn smallbtn" id="download-csv" disabled>↓ CSV</button><button class="btn smallbtn" id="download-pml" disabled>↓ PyMOL</button></div></div><div class="contenthead"><div class="tabs"><button class="tab active" data-tab="his">His substitution candidates</button><button class="tab" data-tab="interface">All interface residues</button><button class="tab" data-tab="selected">Selected candidates</button></div><div class="toolbar"><input class="control" aria-label="Find a residue" id="filter" placeholder="Find residue (B:49 or L69)" style="width:200px;padding:7px 9px"/><select aria-label="Sort residues" id="sort" class="control" style="width:145px;padding:7px 8px;height:32px"><option value="score">Screening score</option><option value="distance">Cα distance</option><option value="chain">Chain / residue number</option></select></div></div>
 <div class="table-wrap"><table><thead><tr id="result-columns"></tr></thead><tbody id="candidate-rows"></tbody></table></div></section>
-<section class="panel" id="pair-panel" hidden><div class="contenthead"><h2>Antigen–antibody interaction candidates</h2><select class="control" id="pair-type" aria-label="Interaction type"><option value="">All interaction types</option><option>Hydrophobic contact</option><option>Hydrogen bond</option><option>Salt bridge</option><option>π–π stacking</option></select></div><p class="small" id="pair-count"></p><div class="table-wrap"><table><thead><tr><th>Interaction</th><th>Antigen residue</th><th>Antibody residue</th><th>Atoms or ring members (Ag ↔ Ab)</th><th>Distance</th><th>Geometry</th></tr></thead><tbody id="pair-rows"></tbody></table></div><details><summary>How contacts are assigned</summary><p>All residues with Cα on the selected partners are screened independently of the His screen, its Cα cutoff and loop ranges. Each row reports the closest qualifying contact of its type for one residue pair.</p><p>Hydrophobic: side-chain C/S atoms of A/V/I/L/M/F/W/P/Y within 4.0 Å. Hydrogen bond candidate: compatible backbone or side-chain donor and acceptor heavy atoms within 3.5 Å; hydrogen positions, directionality and protonation are unresolved. Salt bridge: Lys/Arg side-chain nitrogen and Asp/Glu carboxylate oxygen within 4.0 Å. One pair may qualify for multiple types.</p><p>π–π: complete Phe, Tyr, Trp or His rings, centroids within 5.5 Å, acute interplanar angle ≤30° or ≥60°, and smaller lateral offset ≤2 Å. Ring distances are centroid distances. Static coordinates support geometric hypotheses; side-chain placement in a model can change assignments.</p></details></section>
+<section class="panel" id="pair-panel" hidden><div class="contenthead"><h2>Antigen–antibody interaction candidates</h2><select class="control" id="pair-type" aria-label="Interaction type"><option value="">All interaction types</option><option>Hydrophobic contact</option><option>Hydrogen bond</option><option>Salt bridge</option><option>π–π stacking</option></select></div><p class="small" id="pair-count"></p><div class="table-wrap"><table><thead><tr><th>Interaction</th><th>Antigen residue</th><th>Antigen group</th><th>Antibody residue</th><th>Antibody group</th><th>Atoms or ring members (Ag ↔ Ab)</th><th>Distance</th><th>Geometry</th></tr></thead><tbody id="pair-rows"></tbody></table></div><details><summary>How contacts are assigned</summary><p>All residues with Cα on the selected partners are screened independently of the His screen, its Cα cutoff and loop ranges. For each residue pair and interaction type, the table reports the closest qualifying contact for each antigen/antibody group combination. Backbone atoms are N, CA, C, O and OXT. Aromatic rings belong to the side chain.</p><p>Hydrophobic: side-chain C/S atoms of A/V/I/L/M/F/W/P/Y within 4.0 Å. Hydrogen bond candidate: compatible backbone or side-chain donor and acceptor heavy atoms within 3.5 Å; hydrogen positions, directionality and protonation are unresolved. Salt bridge: Lys/Arg side-chain nitrogen and Asp/Glu carboxylate oxygen within 4.0 Å. One pair may qualify for multiple types.</p><p>π–π: complete Phe, Tyr, Trp or His rings, centroids within 5.5 Å, acute interplanar angle ≤30° or ≥60°, and smaller lateral offset ≤2 Å. Ring distances are centroid distances. Static coordinates support geometric hypotheses; side-chain placement in a model can change assignments.</p></details></section>
 <section class="panel" id="selected-info" style="display:none"><div class="contenthead"><h2>Selected candidate details</h2><button class="btn smallbtn" id="copy-list">Copy mutation list</button></div><div id="selected-detail" class="top-rank-grid"></div></section>
 <details class="panel scoring"><summary>How the His screening score is calculated</summary><div class="method">
 <p>Binder residues within the distance cutoff are ranked after wild-type His is excluded. Higher scores indicate higher screening priority.</p>
@@ -125,6 +125,10 @@ function contactSites(residues){
  }
  return sites;
 }
+const backboneNames=new Set(['N','CA','C','O','OXT']);
+function contactGroup(site){
+ return backboneNames.has(site.atom) ? 'Backbone' : 'Side chain';
+}
 function pairContacts(ag,ab){
  const grid=new Map(),best=new Map(),cell=a=>[a.x,a.y,a.z].map(v=>Math.floor(v/5.5));
  for(const a of contactSites(ag)){
@@ -137,8 +141,9 @@ function pairContacts(ag,ab){
      for(const a of grid.get([i,j,k].join(','))||[]){
        const d=Math.sqrt(d2(a,b));if(d>5.5||d<0.01)continue;
        function record(type,note=''){
-         const key=JSON.stringify([a.r.chain,a.r.seq,b.r.chain,b.r.seq,type]);
-         if(!best.has(key)||d<best.get(key).d)best.set(key,{a,b,d,type,note});
+         const agGroup=contactGroup(a),abGroup=contactGroup(b);
+         const key=JSON.stringify([a.r.chain,a.r.seq,b.r.chain,b.r.seq,type,agGroup,abGroup]);
+         if(!best.has(key)||d<best.get(key).d)best.set(key,{a,b,d,type,note,agGroup,abGroup});
        }
        if(a.normal&&b.normal){
          const v=[b.x-a.x,b.y-a.y,b.z-a.z];
@@ -161,7 +166,7 @@ function showContacts(){
  const frag=document.createDocumentFragment();
  for(const p of rows){
    const tr=el('tr');
-   for(const v of [p.type,aaLabel(p.a.r),aaLabel(p.b.r),p.a.label+' ↔ '+p.b.label,fmt(p.d),p.note||'—'])tr.append(el('td',{},v));
+   for(const v of [p.type,aaLabel(p.a.r),p.agGroup,aaLabel(p.b.r),p.abGroup,p.a.label+' ↔ '+p.b.label,fmt(p.d),p.note||'—'])tr.append(el('td',{},v));
    frag.append(tr);
  }
  $('pair-rows').replaceChildren(frag);
